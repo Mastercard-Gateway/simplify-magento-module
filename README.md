@@ -3,6 +3,9 @@ Simplify Commerce Magento 2 Module
 
 Overview
 --------
+```
+WARNING! WORK IN PROGRESS!
+```
 
 
 Installation
