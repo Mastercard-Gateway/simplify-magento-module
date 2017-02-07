@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="simplifycommerce" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="text">
+                <label>Simplify Commerce by MasterCard</label>
+                <field id="active" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="sort_order" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="25" translate="label" type="text">
+                    <label>Display Order</label>
+                    <frontend_class>validate-number</frontend_class>
+                </field>
+				<field id="public_key" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="20" translate="label" type="text">
+					<label>Public API Key</label>
+				</field>
+				<field id="private_key" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="20" translate="label" type="obscure">
+					<label>Private API Key</label>
+					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+				</field>
+                <field id="order_status" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select">
+                    <label>New Order Status</label>
+                    <source_model>MasterCard\SimplifyCommerce\Model\Config\Source\Order\Status\Pendingpayment</source_model>
+                </field>
+                <field id="payment_action" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="80" translate="label" type="select">
+                    <label>Payment Action</label>
+                    <source_model>MasterCard\SimplifyCommerce\Model\Source\Action</source_model>
+                </field>
+                <field id="simplify_hostedpayments" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="select">
+                    <label>Use Simplify Hosted Payments</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!--
+                <field id="iframe_css" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="92" translate="label" type="text">
+                    <label>IFRAME Stylesheet URL</label>
+                    <depends>
+                        <field id="simplify_hostedpayments">1</field>
+                    </depends>
+                    <comment>URL must start with https:// and return valid CSS.</comment>
+                </field>
+                -->
+                <field id="cctypes" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="100" translate="label" type="multiselect">
+                    <label>Credit Card Types</label>
+                    <source_model>MasterCard\SimplifyCommerce\Model\Source\Cctype</source_model>
+                </field>
+                <field id="currencies" translate="label" type="multiselect" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Accepted Currencies</label>
+                    <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
+                </field>
+                <field id="allowspecific" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="110" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="111" translate="label" type="multiselect">
+                    <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="allowspecific">1</field>
+                    </depends>
+                </field>
+                <field id="customer_save_credit_card" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="120" translate="label" type="select">
+                    <label>Customer can save Credit Card</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Allow customers credit card tokens to be saved for future use.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

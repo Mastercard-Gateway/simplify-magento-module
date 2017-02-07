@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <simplifycommerce>
+                <active>1</active>
+                <model>MasterCard\SimplifyCommerce\Model\Payment</model>
+                <payment_action>authorize_capture</payment_action>
+                <title>Credit Card by Simplify Commerce</title>
+                <order_status>processing</order_status>
+				<public_key>sbpb_ZTBhNzcwMDAtNjM4YS00ZDIwLWE5NDUtYzgxYjMzMDYyZTUx</public_key>
+				<private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted">R/I0Oqq2nO7T4W9Hl3Yc5W3/4ODr91ixcwbFWHUqNPJ5YFFQL0ODSXAOkNtXTToq</private_key>
+                <cctypes>AE,VI,MC,JCB</cctypes>
+                <currencies>AUD,USD</currencies>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <simplify_hostedpayments>1</simplify_hostedpayments>
+                <min_order_total>0.50</min_order_total>
+                <iframe_css></iframe_css>
+            </simplifycommerce>
+        </payment>
+    </default>
+</config>

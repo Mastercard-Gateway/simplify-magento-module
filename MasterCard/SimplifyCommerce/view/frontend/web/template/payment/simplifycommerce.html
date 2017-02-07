@@ -1,0 +1,100 @@
+
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <!-- Radiobutton for selecting this payment method -->
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+    </div>
+
+    <div class="payment-method-content">
+        <!-- Billing addres is disabled if Simplify Hosted Payments used, 
+             as it has its own Billing Address editor -->
+        <!-- ko ifnot: configuration.hostedPaymentsEnabled --> 
+            <!-- Billing address -->
+            <!-- ko foreach: getRegion('messages') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+            <div class="payment-method-billing-address">
+                <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            </div>
+        <!--/ko-->
+
+        <!-- Credit card form -->
+        <form class="form" id="simplifycommerce-form">
+            <!-- ko if: configuration.customerSavedCreditCard -->
+            <!-- CUSTOMER HAS CC -->
+            <!-- /ko -->
+
+            <!-- IFRAME with Simplify Hosted Payments form -->
+            <!-- ko if: configuration.hostedPaymentsEnabled -->
+            <div id="simplifycommerce-controls"> 
+                <iframe                 
+                    name="simplifycommerce-iframe"
+                    frameborder="0" 
+                    style="width: 500px; height: 620px; overflow: hidden;"
+                    data-sc-key="PUBLIC-API-KEY"
+                    data-bind="
+                        afterRender: onSimplifyControlsRendered,
+                        attr: { 'data-sc-key': configuration.publicAPIKey }">
+                </iframe>
+            </div>
+
+            <input type="hidden" id="simplifycommerce_cc_token" name="payment[token]" class="input-text">
+            <input type="hidden" id="simplifycommerce_cc_number" name="payment[cc_number]"/>
+            <input type="hidden" id="simplifycommerce_expiration_month" name="payment[cc_exp_month]"/>
+            <input type="hidden" id="simplifycommerce_expiration_year" name="payment[cc_exp_year]"/>
+            <input type="hidden" id="simplifycommerce_cc_type" name="payment[cc_type]"/>
+            <!-- /ko -->
+
+            <!-- Magento default credit card form -->
+            <!-- ko ifnot: configuration.hostedPaymentsEnabled -->
+                <!-- ko template: 'Magento_Payment/payment/cc-form' --><!-- /ko -->
+            <!-- /ko -->
+
+            <!-- ko if: configuration.canSaveCard -->
+            <div class="field">
+              <div class="control">
+                  <input type="checkbox" name="payment[cc_save]" class="input-checkbox" value="1" id="simplifycommerce_cc_save"
+                         data-bind="attr: {
+                                          autocomplete: off,
+                                          id: getCode() + '_cc_save',
+                                          title: $t('Save Credit Card'),
+                                          'data-container': getCode() + '-cc-save'"/>
+                  <label data-bind="attr: {for: getCode() + '_cc_save'}" class="label">
+                      <span>Save Credit Card</span>
+                  </label>
+                </div>
+            </div>
+            <!-- /ko -->
+        </form>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <!-- Place Order button, hidden if Simplify Hosted Payment form is used, 
+             as it already has its own Pay button -->
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button id="default-place-order"
+                        class="action primary checkout"
+                        type="submit"
+                        data-bind="
+                            click: placeOrder,
+                            attr: { title: $t('Place Order') },
+                            visible: !configuration.hostedPaymentsEnabled,
+                            css: { disabled: !isPlaceOrderActionAllowed() }
+                        ">
+                    <span data-bind="text: $t('Place Order')"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

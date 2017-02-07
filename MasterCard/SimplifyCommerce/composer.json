@@ -1,0 +1,25 @@
+{
+    "name": "mastercard/module-simplifycommerce",
+    "version": "0.0.3",
+    "description": "MasterCard Simplify Commerce",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Tomasz Waraksa",
+            "email": "tomasz.waraksa@mastercard.com"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {
+        "php": "~5.6.0|7.0.2|~7.0.6"
+    },
+    "type": "magento2-module",
+    "autoload": {
+        "psr-4": {
+            "MasterCard\\SimplifyCommerce\\": ""
+        },
+        "files": [
+            "registration.php"
+        ]
+    }
+}
