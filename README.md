@@ -1,4 +1,4 @@
 simplify-magento-module
 =======================
 
-Magento payment method module for Simplify Commerce
+Magento 2 payment module for MasterCard Simplify Commerce
