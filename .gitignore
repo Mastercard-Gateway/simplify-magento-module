@@ -1,0 +1,11 @@
+/.idea
+/bower_components
+/node_modules
+/dist.*
+/reports
+/target
+*.DS_Store
+.slcache
+dist
+*.iml
+*.log
