@@ -11,7 +11,9 @@ define(
       'https://www.simplify.com/commerce/simplify.pay.js',
       'Magento_Checkout/js/model/quote',
       'Magento_Checkout/js/action/place-order',
-      'Magento_Checkout/js/action/redirect-on-success'
+      'Magento_Checkout/js/action/redirect-on-success',
+      'Magento_Checkout/js/checkout-data',
+      'Magento_Customer/js/model/customer'
   ],
   function (
       $, 
@@ -25,7 +27,9 @@ define(
       sc, 
       quote, 
       placeOrderAction, 
-      redirectOnSuccessAction) 
+      redirectOnSuccessAction,
+      checkoutData,
+      customer) 
     {
         'use strict';
 
@@ -62,7 +66,7 @@ define(
                     }
                 }
                 configuration = configuration || { isValid: false }; 
-                configuration.isCustomerLoggedIn = window.isCustomerLoggedIn;
+                configuration.isCustomerLoggedIn = customer.isLoggedIn();
                 log.setDeveloperMode(configuration.isDeveloperMode);
                 return configuration;
             },

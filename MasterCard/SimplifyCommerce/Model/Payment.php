@@ -19,19 +19,23 @@ use Simplify_ObjectNotFoundException as SC_ObjectNotFoundException;
 */
 class SC_Request 
 {
-    public $order = null;
-    public $orderId = null;
-    public $billing = null;
-    public $shipping = null;
-    public $customerid = null;
-    public $token = null;
-    public $cardNumber = null;
-    public $currency = null;
-    public $name = null;
-    public $email = null;
-    public $description = null;
-    public $reference = null;
-    public $amount = null;
+    private $order = null;
+    private $orderId = null;
+    private $billing = null;
+    private $shipping = null;
+    private $customerid = null;
+    private $token = null;
+    private $cardNumber = null;
+    private $expirationYear = null;
+    private $expirationMonth = null;
+    private $cvc = null;
+    private $currency = null;
+    private $name = null;
+    private $email = null;
+    private $description = null;
+    private $reference = null;
+    private $amount = null;
+    private $authorizationId = null;
 
     public function __construct(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         if ($payment) {
@@ -40,15 +44,19 @@ class SC_Request
             $this->billing = $this->order->getBillingAddress();
             $this->shipping = $this->order->getShippingAddress();
             $this->customerid = $this->order->getCustomerId();
-            $this->token = $payment->getAdditionalInformation("cc-token");      
             $this->cardNumber = $payment->getCcNumber();
+            $this->expirationYear = $payment->getCcExpYear();
+            $this->expirationMonth = $payment->getCcExpMonth();
+            $this->cvc = $payment->getCcCid();
             $this->currency = $this->order->getBaseCurrencyCode();
             $this->name = $this->billing->getName();
             $this->email = $this->order->getCustomerEmail();
             $this->description = $this->email;
             $this->reference = "#" . $this->orderId;
+            $this->cardToken = $payment->getAdditionalInformation("cc-token");      
+            $this->authorizationId = $payment->getAdditionalInformation("authorization-id");
         }
-        $this->amount = $amount;
+        $this->amount = intval(round($amount * 100));
     }
 
 
@@ -57,14 +65,39 @@ class SC_Request
      */
     public function getPaymentRequest() {
         $data = null;
-        if ($this->token && $this->amount) {
-            $data = array(
-                "amount" => intval(round($this->amount * 100)),
-                "token" => $this->token,
-                "description" => $this->description,
-                "reference" => $this->reference,
-                "currency" => $this->currency
-            );
+        if ($this->amount && $this->currency) {
+            if ($this->cardToken) {
+                $data = array(
+                    "amount" => $this->amount,
+                    "description" => $this->description,
+                    "token" => $this->cardToken,
+                    "reference" => $this->reference,
+                    "currency" => $this->currency
+                );
+            }
+            else if ($this->cardNumber) {
+                $data = array(
+                    "amount" => $this->amount,
+                    "description" => $this->description,
+                    "card" => array(
+                        "expYear" => $this->expirationYear,
+                        "expMonth" => $this->expirationMonth, 
+                        "cvc" => $this->cvc,
+                        "number" => $this->cardNumber
+                    ),
+                    "reference" => $this->reference,
+                    "currency" => $this->currency
+                );
+            } 
+            else if ($this->authorizationId) {
+                $data = array(
+                    "amount" => $this->amount,
+                    "description" => $this->description,
+                    "authorization" => $this->authorizationId,
+                    "reference" => $this->reference,
+                    "currency" => $this->currency
+                );
+            }
         }
         return $data;
     }
@@ -100,9 +133,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
     protected $_log = null;
     protected $_developerMode = false;
-    protected $_countryFactory = null;
     protected $_storeManager = null;
-    protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
 
 
     public function __construct(
@@ -134,7 +165,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $data
         );
 
-        $this->_countryFactory = $countryFactory;
         $this->_logger = $logger;
         $this->_storeManager = $storeManager;        
 
@@ -147,7 +177,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         $this->_maxAmount = $this->getConfigData('max_order_total');
         $this->_publicKey = $this->getConfigData("public_key");
         $this->_privateKey = $this->getConfigData("private_key");
-        $this->_paymentAction = $this->getConfigData("payment_action");  
+        $this->_paymentAction = $this->getConfigData("payment_action");        
 
         // Configure Simplify Commerce API
         SC::$publicKey = $this->_publicKey;
@@ -187,15 +217,36 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
         $this->_log->info("Authorizing payment ...");
-        $token = $payment->getAdditionalInformation("cc-token");      
-        if (isset($token)) {
-            $order = $payment->getOrder();           
-            $this->_log->info("Card Token     : " . $token);
-            $this->_log->info("Amount         : " . $amount);
-            $this->_log->info("Currency       : " . $order->getBaseCurrencyCode());
-            $payment->setTransactionId("123")->setIsTransactionClosed(1);
+
+        $result = null;
+        try {
+            $request = new SC_Request($payment, $amount);
+            if ($request) {
+                $result = SC_Payment::createAuthorization($request->getPaymentRequest());
+            }
         }
-        $this->_log->info("Authorize done.");
+        catch (Exception $e) {
+            $this->_log->error("Authorization failed:\n" . $e->getMessage());
+            $result = null;
+            throw new \Magento\Framework\Validator\Exception(__("Authorization error: " . implode(", ", $result->errors)));
+        }
+
+        if ($result) {
+            if ($result->paymentStatus == "APPROVED") {
+                $this->_log->info("Authorization approved, ID: " . $result->id);
+                $payment->setTransactionId($result->id);
+                $payment->setCcLast4($result->card->last4);
+                $payment->setIsTransactionClosed(1);
+            } else {
+                $this->_log->warning("Authorization not approved: " . $result->paymentStatus);
+                throw new \Magento\Framework\Validator\Exception(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
+            }
+        }
+        else {            
+            $this->_log->error("Authorization not processed");
+            throw new \Magento\Framework\Validator\Exception(__("Authorization not processed"));
+        }
+
         return $this;
     }
 
@@ -209,38 +260,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     }
 
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-
         $this->_log->info("Capturing payment ...");
 
         $result = null;
-        $order = $payment->getOrder();           
-        $billing = $order->getBillingAddress();
-        $shipping = $order->getShippingAddress();
-        $customerid = $order->getCustomerId();
-        $token = $payment->getAdditionalInformation("cc-token");      
-        $cardNumber = $payment->getCcNumber();
-        $currency = $order->getBaseCurrencyCode();
-        $name = $billing->getName();
-        $description = sprintf('#%s %s %s', $order->getIncrementId(), $name, $order->getCustomerEmail());
-
-        // Payment using card token
-        if ($token) {
-            $this->_log->info("Amount: " . $amount . " " . $currency);
-            $this->_log->info("Order: " . $description);
-            $this->_log->info("Card Token: " . $token);
-            try {
-                $request = new SC_Request($payment, $amount);
+        try {
+            $request = new SC_Request($payment, $amount);
+            if ($request) {
                 $result = SC_Payment::createPayment($request->getPaymentRequest());
             }
-            catch (Exception $e) {
-                $this->_log->error("Payment failed:\n" . $e->getMessage());
-                $result = null;
-                throw new \Magento\Framework\Validator\Exception(__("Payment error: " . implode(", ", $result->errors)));
-            }
         }
-        // Payment using credit card data
-        else if ($cardNumber) {
-            throw new \Magento\Framework\Validator\Exception(__("Payments using built-in credit card form not supported yet"));
+        catch (Exception $e) {
+            $this->_log->error("Payment failed:\n" . $e->getMessage());
+            $result = null;
+            throw new \Magento\Framework\Validator\Exception(__("Payment error: " . implode(", ", $result->errors)));
         }
 
         if ($result) {
@@ -253,9 +285,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $this->_log->warning("Payment not approved: " . $result->paymentStatus);
                 throw new \Magento\Framework\Validator\Exception(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));
             }
-        }            
+        }
+        else {            
+            $this->_log->error("Payment not processed");
+            throw new \Magento\Framework\Validator\Exception(__("Payment not processed"));
+        }
 
-        $this->_log->info("Done.");
         return $this;
     }
 
