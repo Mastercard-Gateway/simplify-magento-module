@@ -32,23 +32,16 @@
 
             <!-- IFRAME with Simplify Hosted Payments form -->
             <!-- ko if: configuration.hostedPaymentsEnabled -->
-            <div id="simplifycommerce-controls"> 
+            <div data-bind="afterRender: onSimplifyContainerRendered">
                 <iframe                 
                     name="simplifycommerce-iframe"
                     frameborder="0" 
-                    style="width: 500px; height: 620px; overflow: hidden;"
                     data-sc-key="PUBLIC-API-KEY"
                     data-bind="
-                        afterRender: onSimplifyControlsRendered,
+                        afterRender: onSimplifyFrameRendered,
                         attr: { 'data-sc-key': configuration.publicAPIKey }">
                 </iframe>
             </div>
-
-            <input type="hidden" id="simplifycommerce_cc_token" name="payment[token]" class="input-text">
-            <input type="hidden" id="simplifycommerce_cc_number" name="payment[cc_number]"/>
-            <input type="hidden" id="simplifycommerce_expiration_month" name="payment[cc_exp_month]"/>
-            <input type="hidden" id="simplifycommerce_expiration_year" name="payment[cc_exp_year]"/>
-            <input type="hidden" id="simplifycommerce_cc_type" name="payment[cc_type]"/>
             <!-- /ko -->
 
             <!-- Magento default credit card form -->

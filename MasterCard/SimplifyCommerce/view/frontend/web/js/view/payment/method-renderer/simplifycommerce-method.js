@@ -39,9 +39,18 @@ define(
             /** UI view template for the payment method */
             defaults: { template: "MasterCard_SimplifyCommerce/payment/simplifycommerce" },
             /** Payment method configuration */
-            configuration: null,
+            configuration: {},
             /** Timeout [ms] for payment operations */
             timeout: 5000,
+            /** Container where Simplify Commerce hosted form is displayed */
+            simplifyContainer: null,
+
+
+            /** Initializes the payment method */
+            initialize: function () {
+                this._super();
+                return this;
+            },
 
 
             /** Unique code of the payment method */
@@ -75,9 +84,26 @@ define(
             /** Triggered when payment form placeholder has been loaded.
              *  Simplify Commerce Hosted Payment form can now initialize.
              */
-            onSimplifyControlsRendered: function(event) {
-                component.handler = new SimplifyCommerceHandler(component.configuration, quote, component.onCardProcessed);
-                if (!component.handler.isValid) {
+            onSimplifyContainerRendered: function(sender) {
+                component.simplifyContainer = sender;
+            },
+
+            onSimplifyFrameRendered: function(sender) {
+                log.debug("Frame rendered", sender); 
+                if (component.simplifyContainer) {
+                    if (!component.handler) {
+                        component.handler = new SimplifyCommerceHandler(component.configuration, quote, component.onCardProcessed, component.simplifyContainer);
+                        log.debug("Handler initialized");
+                    }
+                    else {
+                        log.debug("Handler already present", component.handler);
+                        component.handler.initializeHostedPayments(component.simplifyContainer);
+                    }
+                }
+                else {
+                    log.error("Hosted Payment Form container not found");
+                }
+                if (!(component.handler && component.handler.isValid)) {
                     component.showError($t("Simplify Commerce Hosted Payments could not be initialized"));
                     // disable placing orders
                     this.isPlaceOrderActionAllowed(false);
@@ -91,7 +117,8 @@ define(
                     component.showSuccess($t("Credit card validated, authorizing payment ..."));
                     screenOverlay.startLoader();
                     component.submitOrder(payment);
-                    // remove load if timeout passes, without page being reloaded
+                    // Hide loader overlay after a while - if JS errors happen, 
+                    // it might never be hidden, therefore confusing the user.
                     window.setTimeout(function() {
                         screenOverlay.stopLoader();
                     }, component.timeout);
@@ -178,7 +205,7 @@ define(
 
         
         /** Simplify Commerce payment handler */
-        function SimplifyCommerceHandler(configuration, quote, onCardProcessed) {
+        function SimplifyCommerceHandler(configuration, quote, onCardProcessed, container) {
             var log = new SimplifyCommerceLog();
             var handler = {
                 /** Indicates that Simplify Commerce Hosted Payments API is available */
@@ -217,22 +244,14 @@ define(
                         return false;
                     }
 
-                    // check availability of UI controls
-                    var container = $("#simplifycommerce-controls");
-                    var frame = $("iframe[name=simplifycommerce-iframe]");
-                    if (!(container.length && frame.length)) {
-                        log.error("The required UI components not found!");                    
-                        return false;
-                    }
-
                     // check presence of payment information
                     handler.payment = handler.toSimplifyPayment(handler.operation, configuration, quote);
                     if (handler.payment && handler.payment.isValid) {
                         // callback where result of payment operation is returned
                         handler.onCardProcessed = onCardProcessed;
                         // Initialize Simplify Hosted Payments form
-                        handler.hostedPayments = SimplifyCommerce.hostedPayments(handler.onSimplifyResponse, handler.payment, container[0]);
-                        handler.isValid = true;
+                        handler.isValid = handler.initializeHostedPayments(container);
+                        
                     }
                     else {
                         handler.payment = null;
@@ -243,21 +262,32 @@ define(
                     return handler.isValid;
                 },
 
+                /** Initializes Simplify Commerce Hosted Payments form */
+                initializeHostedPayments: function(container) {
+                    var result = false;
+                    if (container) {
+                        handler.hostedPayments = SimplifyCommerce.hostedPayments(handler.onSimplifyResponse, handler.payment, container);
+                        result = true;
+                    }
+                    else {
+                        log.error("The required UI components not found!");                    
+                    }
+                    return result;
+                },
+
 
                 /** Called when Simplify Commerce returns from payment/tokenize operation */
                 onSimplifyResponse: function(response) {
                     if (response) {
+                        var payment = handler.toMagentoPayment(response);
+                        // if card verification failed, allow correcting errors and running the payment again
+                        if (!(payment && payment.success)) {
+                            if (handler.hostedPayments) {
+                                handler.hostedPayments.enablePayBtn();
+                            }
+                        }
                         if (handler.onCardProcessed) {
-                            var payment = handler.toMagentoPayment(response);
-                            // if card verification failed, allow correcting errors and running the payment again
-                            if (!(payment && payment.success)) {
-                                if (handler.hostedPayments) {
-                                    handler.hostedPayments.enablePayBtn();
-                                }
-                            }
-                            if (handler.onCardProcessed) {
-                                handler.onCardProcessed(payment);
-                            }
+                            handler.onCardProcessed(payment);
                         }
                     }
                 },
@@ -317,27 +347,37 @@ define(
 
                 /** Returns true if Simplify Commerce payment operation has succeeded */
                 hasPaymentSucceeded: function(operation, payment) {
+                    var result = false;
                     if (operation && payment) {
                         switch (operation) {
-                            case "create.payment": return payment.paymentStatus === "APPROVED";
-                            case "create.token": return Boolean(payment.cardToken && payment.cardToken.trim().length);
+                            case "create.payment": 
+                                result = payment.paymentStatus === "APPROVED";
+                                break;
+
+                            case "create.token": 
+                                result = Boolean(payment.cardToken && payment.cardToken.trim().length);
+                                break;
                         }
                     }
-                    return false;
+                    return result;
                 },
 
 
                 /** Maps Simplify Commerce card type to Magento card types */
                 toMagentoCardType: function(cardType) {
+                    var result = null;
                     if (cardType) {
                         var types = {
-                            VISA: 'VI',
-                            MASTERCARD: 'MC',
-                            AMEX: 'AE',
-                            JCB: 'JCB'
+                            VISA: "VI",
+                            MASTERCARD: "MC",
+                            AMEX: "AE",
+                            JCB: "JCB",
+                            DISCOVER: "DI",
+                            DINERS: "DN"
                         };
-                        return types[cardType.toString().toUpperCase()];
+                        result = types[cardType.toString().toUpperCase()];
                     }
+                    return result;
                 }
 
             };
@@ -369,8 +409,6 @@ define(
             return handler;
         }
 
-
-        // Initialize the component
         component.configuration = component.getConfiguration();
         return Component.extend(component);
     }
