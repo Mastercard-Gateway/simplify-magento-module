@@ -11,14 +11,15 @@ use Psr\Log\LoggerInterface;
 use Simplify as SC;
 use Simplify_Payment as SC_Payment;
 use Simplify_Authorization as SC_Authorization;
+use Simplify_Refund as SC_Refund;
 use Simplify_Customer as SC_Customer;
 use Simplify_ObjectNotFoundException as SC_ObjectNotFoundException;
 
 
 /*
- * Payment request data, as required by Simplify Commerce APIs
+ * Request builder, for creating Simplify Commerce API requests 
 */
-class SC_Request 
+class SC_RequestBuilder
 {
     private $order = null;
     private $orderId = null;
@@ -36,12 +37,15 @@ class SC_Request
     private $description = null;
     private $reference = null;
     private $amount = null;
-    private $authorizationId = null;
+    private $parentTransactionId = null;
+    private $transactionId = null;
 
     public function __construct(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         if ($payment) {
             $this->order = $payment->getOrder();      
             $this->orderId = $this->order->getIncrementId();
+            $this->transactionId = $payment->getTransactionId();
+            $this->parentTransactionId = $payment->getParentTransactionId();
             $this->billing = $this->order->getBillingAddress();
             $this->shipping = $this->order->getShippingAddress();
             $this->customerid = $this->order->getCustomerId();
@@ -55,25 +59,23 @@ class SC_Request
             $this->description = $this->email;
             $this->reference = "#" . $this->orderId;
             $this->cardToken = $payment->getAdditionalInformation("cc-token");      
-            //$this->authorizationId = $payment->getAdditionalInformation("authorization-id");
-            $this->authorizationId = $payment->getParentTransactionId();
         }
         $this->amount = intval(round($amount * 100));
     }
 
 
     /*
-     * Returns data for Simplify Commerce CreatePayment request
+     * Returns data for Simplify Commerce CreatePayment and CreateAuthorization requests
      */
     public function getPaymentRequest() {
         $data = null;
         if ($this->amount && $this->currency) {
             // capture pre-authorized payment
-            if ($this->authorizationId) {
+            if ($this->parentTransactionId) {
                 $data = array(
                     "amount" => $this->amount,
                     "description" => $this->description,
-                    "authorization" => $this->authorizationId,
+                    "authorization" => $this->parentTransactionId,
                     "reference" => $this->reference,
                     "currency" => $this->currency
                 );
@@ -103,6 +105,23 @@ class SC_Request
                     "currency" => $this->currency
                 );
             } 
+        }
+        return $data;
+    }
+
+
+    /*
+     * Returns data for Simplify Commerce CreateRefund request
+     */
+    public function getRefundRequest($reason) {
+        $data = null;        
+        if ($this->amount && $this->currency && $this->transactionId) { 
+            $data = array(
+                "amount" => $this->amount,
+                "description" => is_null($reason) ? __("Refund") : $reason,
+                "payment" => $this->parentTransactionId,
+                "reference" => $this->reference
+            );
         }
         return $data;
     }
@@ -226,15 +245,16 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
         $result = null;
         try {
-            $request = new SC_Request($payment, $amount);
+            $requestBuilder = new SC_RequestBuilder($payment, $amount);
+            $request = $requestBuilder->getPaymentRequest();
             if ($request) {
-                $result = SC_Authorization::createAuthorization($request->getPaymentRequest());
+                $result = SC_Authorization::createAuthorization($request);
             }
         }
         catch (Exception $e) {
-            $this->_log->error("Authorization failed:\n" . $e->getMessage());
+            $this->_log->error("Authorization failed: " . $e->getMessage());
             $result = null;
-            throw new \Magento\Framework\Validator\Exception(__("Authorization error: " . implode(", ", $result->errors)));
+            throw new \Magento\Framework\Exception\LocalizedException(__("Authorization error: " . implode(", ", $result->errors)));
         }
 
         if ($result) {
@@ -246,12 +266,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $payment->setIsTransactionClosed(false);
             } else {
                 $this->_log->warning("Authorization not approved: " . $result->paymentStatus);
-                throw new \Magento\Framework\Validator\Exception(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
+                throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
             }
         }
         else {            
             $this->_log->error("Authorization not processed");
-            throw new \Magento\Framework\Validator\Exception(__("Authorization not processed"));
+            throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not processed"));
         }
 
         return $this;
@@ -271,33 +291,33 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
         $result = null;
         try {
-            $request = new SC_Request($payment, $amount);
+            $requestBuilder = new SC_RequestBuilder($payment, $amount);
+            $request = $requestBuilder->getPaymentRequest();
             if ($request) {
-                $result = SC_Payment::createPayment($request->getPaymentRequest());
+                $result = SC_Payment::createPayment($request);
             }
         }
         catch (Exception $e) {
-            $this->_log->error("Payment failed:\n" . $e->getMessage());
+            $this->_log->error("Payment failed: " . $e->getMessage());
             $result = null;
-            throw new \Magento\Framework\Validator\Exception(__("Payment error: " . implode(", ", $result->errors)));
+            throw new \Magento\Framework\Exception\LocalizedException(__("Payment error: " . implode(", ", $result->errors)));
         }
 
         if ($result) {
             if ($result->paymentStatus == "APPROVED") {
                 $this->_log->info("Payment approved, ID: " . $result->id);
                 $payment->setTransactionId($result->id);
-                $payment->setParentTransactionId($result->id);
                 $payment->setCcLast4($result->card->last4);
                 $payment->setIsTransactionClosed(false);
                 $payment->setShouldCloseParentTransaction(true);
             } else {
                 $this->_log->warning("Payment not approved: " . $result->paymentStatus);
-                throw new \Magento\Framework\Validator\Exception(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));
+                throw new \Magento\Framework\Exception\LocalizedException(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));
             }
         }
         else {            
             $this->_log->error("Payment not processed");
-            throw new \Magento\Framework\Validator\Exception(__("Payment not processed"));
+            throw new \Magento\Framework\Exception\LocalizedException(__("Payment not processed"));
         }
 
         return $this;
@@ -325,20 +345,37 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         $this->_log->info("Refunding payment ...");
-        $transactionId = $payment->getParentTransactionId();
-        $order = $payment->getOrder();
 
         // ... call Simplify API
+        $result = null;
+        $refundStatus = __("Refund not approved");
+        try {
+            $requestBuilder = new SC_RequestBuilder($payment, $amount);
+            $this->_log->info("requestBuilder.amount" . $amount);
+            $this->_log->info("requestBuilder.currency" . $payment->getOrder()->getBaseCurrencyCode());
+            $this->_log->info("requestBuilder.transactionId" . $payment->getParentTransactionId());
+            $request = $requestBuilder->getRefundRequest(__("Refund"));
+            if ($request) {
+                $this->_log->info("Refund request: " . var_export($request));
+                $result = SC_Refund::createRefund($requestBuilder->getRefundRequest(__("Refund")));
+            }
+        }
+        catch (Exception $e) { 
+            $result = null;
+            $refundStatus = $e->getMessage();
+            $this->_log->error("Refund failed: " . $refundStatus);
+            throw new \Magento\Framework\Exception\LocalizedException(__("Refund error: " . $refundStatus));
+        }
 
-        if (true) {
-          $payment
-              ->setTransactionId($result->response->id)
-              ->setParentTransactionId($transactionId)
-              ->setIsTransactionClosed(1)
-              ->setShouldCloseParentTransaction(1);
-        } 
-        else {
-            throw new \Magento\Framework\Validator\Exception(__('Payment refunding error - ' . implode(', ', $result->errors)));
+        if ($result) {
+            $payment->setTransactionId($result->id);
+            $payment->setIsTransactionClosed(true);
+            $payment->setShouldCloseParentTransaction(true);
+            $this->_log->info("Refund approved, ID: " . $result->id);
+        }
+        else {            
+            $this->_log->error("Refund not processed");
+            throw new \Magento\Framework\Exception\LocalizedException(__("Refund not processed"));
         }
 
         return $this;
