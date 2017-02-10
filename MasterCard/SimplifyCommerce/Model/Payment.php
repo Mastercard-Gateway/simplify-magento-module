@@ -21,24 +21,24 @@ use Simplify_ObjectNotFoundException as SC_ObjectNotFoundException;
 */
 class SC_RequestBuilder
 {
-    private $order = null;
-    private $orderId = null;
-    private $billing = null;
-    private $shipping = null;
-    private $customerid = null;
-    private $token = null;
-    private $cardNumber = null;
-    private $expirationYear = null;
-    private $expirationMonth = null;
-    private $cvc = null;
-    private $currency = null;
-    private $name = null;
-    private $email = null;
-    private $description = null;
-    private $reference = null;
-    private $amount = null;
-    private $parentTransactionId = null;
-    private $transactionId = null;
+    protected $order = null;
+    protected $orderId = null;
+    protected $billing = null;
+    protected $shipping = null;
+    protected $customerid = null;
+    protected $token = null;
+    protected $cardNumber = null;
+    protected $expirationYear = null;
+    protected $expirationMonth = null;
+    protected $cvc = null;
+    protected $currency = null;
+    protected $name = null;
+    protected $email = null;
+    protected $description = null;
+    protected $reference = null;
+    protected $amount = null;
+    protected $parentTransactionId = null;
+    protected $transactionId = null;
 
     public function __construct(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         if ($payment) {
@@ -118,7 +118,7 @@ class SC_RequestBuilder
         if ($this->amount && $this->currency && $this->transactionId) { 
             $data = array(
                 "amount" => $this->amount,
-                "description" => is_null($reason) ? __("Refund") : $reason,
+                "description" => is_null($reason) ? __("Refund for ") . $this->reference : $reason,
                 "payment" => $this->parentTransactionId,
                 "reference" => $this->reference
             );
@@ -252,9 +252,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             }
         }
         catch (Exception $e) {
-            $this->_log->error("Authorization failed: " . $e->getMessage());
-            $result = null;
-            throw new \Magento\Framework\Exception\LocalizedException(__("Authorization error: " . implode(", ", $result->errors)));
+            $status = $e->getMessage();
+            $this->_log->error("Authorization failed: " . $status);
+            throw new \Magento\Framework\Exception\LocalizedException(__("Authorization failes: " . $status));
         }
 
         if ($result) {
@@ -298,9 +298,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             }
         }
         catch (Exception $e) {
-            $this->_log->error("Payment failed: " . $e->getMessage());
-            $result = null;
-            throw new \Magento\Framework\Exception\LocalizedException(__("Payment error: " . implode(", ", $result->errors)));
+            $status = $e->getMessage();
+            $this->_log->error("Payment failed: " . $status);
+            throw new \Magento\Framework\Exception\LocalizedException(__("Payment failed: " . $status));
         }
 
         if ($result) {
@@ -316,8 +316,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             }
         }
         else {            
-            $this->_log->error("Payment not processed");
-            throw new \Magento\Framework\Exception\LocalizedException(__("Payment not processed"));
+            $this->_log->error("Payment not executed");
+            throw new \Magento\Framework\Exception\LocalizedException(__("Payment not executed"));
         }
 
         return $this;
@@ -330,6 +330,33 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
         $this->_log->info("Voiding payment ...");
+
+        $result = false;
+        try {
+            $requestBuilder = new SC_RequestBuilder($payment, $amount);
+            if ($request) {
+                $authorization = SC_Authorization::findAuthorization($requestBuilder->transactionId);
+                if ($authorization) {
+                    $result = SC_Authorization::deleteAuthorization($authorization);
+                }
+            }
+        }
+        catch (Exception $e) { 
+            $status = $e->getMessage();
+            $this->_log->error("Void failed: " . $status);
+            throw new \Magento\Framework\Exception\LocalizedException(__("Void failed: " . $refundStatus));
+        }
+
+        if ($result) {
+            $payment->setIsTransactionClosed(true);
+            $payment->setShouldCloseParentTransaction(true);
+            $this->_log->info("Void approved");
+        }
+        else {            
+            $this->_log->error("Void not executed");
+            throw new \Magento\Framework\Exception\LocalizedException(__("Void not executed"));
+        }
+
         return $this;
     }
 
@@ -346,25 +373,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         $this->_log->info("Refunding payment ...");
 
-        // ... call Simplify API
         $result = null;
-        $refundStatus = __("Refund not approved");
+        $status = __("Refund not approved");
         try {
             $requestBuilder = new SC_RequestBuilder($payment, $amount);
-            $this->_log->info("requestBuilder.amount" . $amount);
-            $this->_log->info("requestBuilder.currency" . $payment->getOrder()->getBaseCurrencyCode());
-            $this->_log->info("requestBuilder.transactionId" . $payment->getParentTransactionId());
-            $request = $requestBuilder->getRefundRequest(__("Refund"));
+            $request = $requestBuilder->getRefundRequest(null);
             if ($request) {
-                $this->_log->info("Refund request: " . var_export($request));
-                $result = SC_Refund::createRefund($requestBuilder->getRefundRequest(__("Refund")));
+                $result = SC_Refund::createRefund($request);
             }
         }
         catch (Exception $e) { 
-            $result = null;
-            $refundStatus = $e->getMessage();
+            $status = $e->getMessage();
             $this->_log->error("Refund failed: " . $refundStatus);
-            throw new \Magento\Framework\Exception\LocalizedException(__("Refund error: " . $refundStatus));
+            throw new \Magento\Framework\Exception\LocalizedException(__("Refund failed: " . $status));
         }
 
         if ($result) {
@@ -374,8 +395,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $this->_log->info("Refund approved, ID: " . $result->id);
         }
         else {            
-            $this->_log->error("Refund not processed");
-            throw new \Magento\Framework\Exception\LocalizedException(__("Refund not processed"));
+            $this->_log->error("Refund not executed");
+            throw new \Magento\Framework\Exception\LocalizedException(__("Refund not executed"));
         }
 
         return $this;
