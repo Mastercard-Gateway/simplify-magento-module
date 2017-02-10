@@ -312,7 +312,8 @@ define(
                         }
                         var total = quote.totals();
                         var billingAddress = quote.billingAddress() || {};
-
+                        log.debug("quote", quote);
+                        log.debug("billingAddress", billingAddress);
                         payment = {
                             scKey: clean(configuration.publicAPIKey),
                             color: "#1979C3",
@@ -321,8 +322,12 @@ define(
                             masterpass: false,
                             description: clean(configuration.storeName, "Magento Store"),
                             operation: clean(operation),
-                            customerName: clean(configuration.customerName),
-                            customerEmail: clean(configuration.customerEmail),
+                            customerName: configuration.isCustomerLoggedIn ? 
+                                            clean(configuration.customerName, billingAddress.company) : 
+                                            clean(concatenate(billingAddress.firstname, billingAddress.lastname), billingAddress.company),
+                            customerEmail: configuration.isCustomerLoggedIn ? 
+                                            clean(configuration.customerEmail) : 
+                                            clean(quote.guestEmail),
                             reference: "#" + clean(quote.getQuoteId()),
                             amount: clean(total.grand_total * 100, 0),
                             currency: clean(total.base_currency_code),
@@ -334,6 +339,7 @@ define(
                         };
                         payment.isValid = payment.amount > 0 && payment.currency;
                     }
+                    log.debug("toSimplifyPayment result", payment);
                     return payment;
                 },
 
@@ -409,7 +415,7 @@ define(
             /** Returns null or defaultValue, if the specified value is undefined, null or empty string */
             function clean(value, defaultValue) {
                 if (!value || value.toString().trim() === "") 
-                    return defaultValue || null;
+                    return defaultValue || undefined;
                 else
                     return value.toString();
             }
