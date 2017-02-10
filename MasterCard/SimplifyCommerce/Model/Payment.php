@@ -7,7 +7,6 @@ require_once("Utilities.php");
 require_once("Simplify.php");
 
 use \Exception;
-use Psr\Log\LoggerInterface;
 use Simplify as SC;
 use Simplify_Payment as SC_Payment;
 use Simplify_Authorization as SC_Authorization;
@@ -28,6 +27,7 @@ class SC_RequestBuilder
     protected $customerid = null;
     protected $token = null;
     protected $cardNumber = null;
+    protected $cardType = null;
     protected $expirationYear = null;
     protected $expirationMonth = null;
     protected $cvc = null;
@@ -39,6 +39,14 @@ class SC_RequestBuilder
     protected $amount = null;
     protected $parentTransactionId = null;
     protected $transactionId = null;
+    protected $cardTypes = array(
+            "VI" => "VISA",
+            "MC" => "MASTERCARD",
+            "AE" => "AMEX",
+            "JCB" => "JCB",
+            "DI" => "DISCOVER",
+            "DN" => "DINERS"
+    );
 
     public function __construct(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         if ($payment) {
@@ -50,7 +58,8 @@ class SC_RequestBuilder
             $this->shipping = $this->order->getShippingAddress();
             $this->customerid = $this->order->getCustomerId();
             $this->cardNumber = $payment->getCcNumber();
-            $this->expirationYear = $payment->getCcExpYear();
+            $this->cardType = $this->toSimplifyCardType($payment->getCcType());
+            $this->expirationYear = $this->toSimplifyYear($payment->getCcExpYear());
             $this->expirationMonth = $payment->getCcExpMonth();
             $this->cvc = $payment->getCcCid();
             $this->currency = $this->order->getBaseCurrencyCode();
@@ -64,9 +73,26 @@ class SC_RequestBuilder
     }
 
 
-    /*
-     * Returns data for Simplify Commerce CreatePayment and CreateAuthorization requests
-     */
+    /* Converts Magento card type to Simplify card type */
+    public function toSimplifyCardType($cardType) {
+        $result = $cardType;
+        try {
+            $result = $this->cardTypes[$cardType];
+        }
+        catch (Exception $e) {
+        }
+        return $result;
+    }
+
+    /* Converts Magento expiration year to Simplify year */
+    public function toSimplifyYear($year) {
+        if ($year) {
+            $year = intval(substr(strval($year), -2));
+        }
+        return $year;
+    }
+
+    /* Returns data for Simplify Commerce CreatePayment and CreateAuthorization requests */
     public function getPaymentRequest() {
         $data = null;
         if ($this->amount && $this->currency) {
@@ -110,9 +136,7 @@ class SC_RequestBuilder
     }
 
 
-    /*
-     * Returns data for Simplify Commerce CreateRefund request
-     */
+    /* Returns data for Simplify Commerce CreateRefund request */
     public function getRefundRequest($reason) {
         $data = null;        
         if ($this->amount && $this->currency && $this->transactionId) { 
@@ -471,41 +495,26 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
 
     /** 
-     * Assign additional card data to payment instance 
+     * Assign card data from input form to payment instance 
      */
     public function assignData(\Magento\Framework\DataObject $data) {
         if (!$data instanceof \Magento\Framework\DataObject) {
             $data = new \Magento\Framework\DataObject($data);
         }
-        $additionalData = $data->getData("additional_data");
-        $data->setCcType($additionalData["cc-type"]);
-        $data->setCcExpMonth($additionalData["cc-expiration-month"]);
-        $data->setCcExpYear($additionalData["cc-expiration-year"]);
-        if (isset($additionalData["cc-number"])) {
-          $data->setCcNumber($additionalData["cc-number"]);
-          $data->setCcLast4(substr($additionalData["cc-number"], -4));
-        }
-        if (isset($additionalData["cc-cid"])) {
-            $data->setCcCid($additionalData["cc-cid"]);
-        }
-        $info = $this->getInfoInstance();
-        $info
-            ->setCcType($data->getCcType())
-            ->setCcOwner($data->getCcOwner())
-            ->setCcLast4(substr($data->getCcNumber(), -4))
-            ->setCcNumber($data->getCcNumber())
-            ->setCcCid($data->getCcCid())
-            ->setCcExpMonth($data->getCcExpMonth())
-            ->setCcExpYear($data->getCcExpYear())
-            ->setCcSsIssue($data->getCcSsIssue())
-            ->setCcSsStartMonth($data->getCcSsStartMonth())
-            ->setCcSsStartYear($data->getCcSsStartYear());
-
-        if (isset($additionalData["cc-token"])) {
-            $info->setAdditionalInformation("cc-token", $additionalData["cc-token"]);
-        }
-        if (isset($additionalData["cc-save"])) {
-            $info->setAdditionalInformation("cc-save", $additionalData["cc-save"]);
+        parent::assignData($data);
+        $additionalData = $data->getData(\Magento\Quote\Api\Data\PaymentInterface::KEY_ADDITIONAL_DATA);
+        if ($additionalData) {
+            $payment = $this->getInfoInstance();
+            // pass credit card from built-in payment form
+            $payment->addData($additionalData);
+            // pass card token from Simplify Hosted Payment form
+            if (isset($additionalData["cc-token"])) {
+                $payment->setAdditionalInformation("cc-token", $additionalData["cc-token"]);
+            }
+            // pass instruction to save the card
+            if (isset($additionalData["cc-save"])) {
+                $payment->setAdditionalInformation("cc-save", $additionalData["cc-save"]);
+            }
         }
         return $this;
     }

@@ -47,6 +47,15 @@ define(
 
 
             /** Initializes the payment method */
+            initObservable: function () {
+                // Magento 2 bug fix: forgotten subscribe on creditCardType in cc-form.js,
+                // effectively card type is not being passed to the server side
+                this._super()
+                    .observe(["creditCardType"]);
+
+                return this;
+            },
+
             initialize: function () {
                 this._super();
                 return this;
@@ -391,7 +400,7 @@ define(
                             DISCOVER: "DI",
                             DINERS: "DN"
                         };
-                        result = types[cardType.toString().toUpperCase()];
+                        result = types[cardType.toString().toUpperCase()] || cardType;
                     }
                     return result;
                 }
