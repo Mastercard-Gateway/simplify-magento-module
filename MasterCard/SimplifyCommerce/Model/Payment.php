@@ -130,6 +130,15 @@ class SC_RequestBuilder
                     "reference" => $this->reference,
                     "currency" => $this->currency
                 );
+                if ($this->billing) {
+                    $data["card"]["name"] = $this->billing->getName();
+                    $data["card"]["addressCity"] = $this->billing->getCity();
+                    $data["card"]["addressLine1"] = $this->billing->getStreetLine(1);
+                    $data["card"]["addressLine2"] = $this->billing->getStreetLine(2);
+                    $data["card"]["addressZip"] = $this->billing->getPostcode();
+                    $data["card"]["addressState"] = $this->billing->getRegion();
+                    $data["card"]["addressCountry"] = $this->billing->getCountryId();
+                }
             } 
         }
         return $data;
