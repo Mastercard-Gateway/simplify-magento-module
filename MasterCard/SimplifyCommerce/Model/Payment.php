@@ -10,6 +10,7 @@ use \Exception;
 use Psr\Log\LoggerInterface;
 use Simplify as SC;
 use Simplify_Payment as SC_Payment;
+use Simplify_Authorization as SC_Authorization;
 use Simplify_Customer as SC_Customer;
 use Simplify_ObjectNotFoundException as SC_ObjectNotFoundException;
 
@@ -54,7 +55,8 @@ class SC_Request
             $this->description = $this->email;
             $this->reference = "#" . $this->orderId;
             $this->cardToken = $payment->getAdditionalInformation("cc-token");      
-            $this->authorizationId = $payment->getAdditionalInformation("authorization-id");
+            //$this->authorizationId = $payment->getAdditionalInformation("authorization-id");
+            $this->authorizationId = $payment->getParentTransactionId();
         }
         $this->amount = intval(round($amount * 100));
     }
@@ -66,7 +68,18 @@ class SC_Request
     public function getPaymentRequest() {
         $data = null;
         if ($this->amount && $this->currency) {
-            if ($this->cardToken) {
+            // capture pre-authorized payment
+            if ($this->authorizationId) {
+                $data = array(
+                    "amount" => $this->amount,
+                    "description" => $this->description,
+                    "authorization" => $this->authorizationId,
+                    "reference" => $this->reference,
+                    "currency" => $this->currency
+                );
+            }
+            // authorize/capture payment using card token
+            else if ($this->cardToken) {
                 $data = array(
                     "amount" => $this->amount,
                     "description" => $this->description,
@@ -75,6 +88,7 @@ class SC_Request
                     "currency" => $this->currency
                 );
             }
+            // authorize/capture payment using raw card data
             else if ($this->cardNumber) {
                 $data = array(
                     "amount" => $this->amount,
@@ -89,15 +103,6 @@ class SC_Request
                     "currency" => $this->currency
                 );
             } 
-            else if ($this->authorizationId) {
-                $data = array(
-                    "amount" => $this->amount,
-                    "description" => $this->description,
-                    "authorization" => $this->authorizationId,
-                    "reference" => $this->reference,
-                    "currency" => $this->currency
-                );
-            }
         }
         return $data;
     }
@@ -213,6 +218,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
     /** 
      * Authorize payment 
+     * Payment interface: /vendor/magento/module-sales/Model/Order/Payment.php
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -222,7 +228,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         try {
             $request = new SC_Request($payment, $amount);
             if ($request) {
-                $result = SC_Payment::createAuthorization($request->getPaymentRequest());
+                $result = SC_Authorization::createAuthorization($request->getPaymentRequest());
             }
         }
         catch (Exception $e) {
@@ -235,8 +241,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             if ($result->paymentStatus == "APPROVED") {
                 $this->_log->info("Authorization approved, ID: " . $result->id);
                 $payment->setTransactionId($result->id);
+                $payment->setParentTransactionId($result->id);
                 $payment->setCcLast4($result->card->last4);
-                $payment->setIsTransactionClosed(1);
+                $payment->setIsTransactionClosed(false);
             } else {
                 $this->_log->warning("Authorization not approved: " . $result->paymentStatus);
                 throw new \Magento\Framework\Validator\Exception(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
@@ -279,8 +286,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             if ($result->paymentStatus == "APPROVED") {
                 $this->_log->info("Payment approved, ID: " . $result->id);
                 $payment->setTransactionId($result->id);
+                $payment->setParentTransactionId($result->id);
                 $payment->setCcLast4($result->card->last4);
-                $payment->setIsTransactionClosed(1);
+                $payment->setIsTransactionClosed(false);
+                $payment->setShouldCloseParentTransaction(true);
             } else {
                 $this->_log->warning("Payment not approved: " . $result->paymentStatus);
                 throw new \Magento\Framework\Validator\Exception(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));

@@ -89,15 +89,13 @@ define(
             },
 
             onSimplifyFrameRendered: function(sender) {
-                log.debug("Frame rendered", sender); 
                 if (component.simplifyContainer) {
                     if (!component.handler) {
                         component.handler = new SimplifyCommerceHandler(component.configuration, quote, component.onCardProcessed, component.simplifyContainer);
-                        log.debug("Handler initialized");
                     }
                     else {
-                        log.debug("Handler already present", component.handler);
-                        component.handler.initializeHostedPayments(component.simplifyContainer);
+                        // Rather brutal attempt to patch to the problem of empty IFRAME after single-page navigations 
+                        window.location.reload();
                     }
                 }
                 else {
@@ -121,6 +119,9 @@ define(
                     // it might never be hidden, therefore confusing the user.
                     window.setTimeout(function() {
                         screenOverlay.stopLoader();
+                        if (component.handler) {
+                            component.handler.enablePayButton();
+                        }
                     }, component.timeout);
                 } 
                 else {
@@ -273,6 +274,15 @@ define(
                         log.error("The required UI components not found!");                    
                     }
                     return result;
+                },
+
+
+                /** Enables pay button, usually called after failed operations 
+                  * to allow user to correct problems and resubmit the payment */
+                enablePayButton: function() {
+                    if (handler.hostedPayments) {
+                        handler.hostedPayments.enablePayBtn();
+                    }
                 },
 
 
