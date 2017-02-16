@@ -2,6 +2,7 @@ define(
   [
       'jquery',
       'underscore',
+      'ko',
       'mage/translate',
       'Magento_Payment/js/view/payment/cc-form',
       'Magento_Payment/js/model/credit-card-validation/validator',
@@ -18,6 +19,7 @@ define(
   function (
       $, 
       __, 
+      ko,
       $t, 
       Component, 
       validator, 
@@ -44,7 +46,32 @@ define(
             timeout: 5000,
             /** Container where Simplify Commerce hosted form is displayed */
             simplifyContainer: null,
-
+            /** Flag indicating that customer wants to store his credit card */
+            isStoreCreditCardChecked: ko.observable(false),
+            /** Indicates whether pay button is visible */
+            isPayButtonVisible: ko.observable(false),
+            /** Saved credit cards of the customer */
+            savedCards: {
+                items: ko.observableArray([]),
+                available: ko.observable(false),
+                selectedCard: ko.observable("other"),
+                getCardId: function(last4) {
+                    return "simplifycommerce-card-" + last4;
+                },
+                getCardTitle: function(type, last4) {
+                    return type.toUpperCase() + " ****-****-****-" + last4;
+                },
+                cardSelected: function(last4) {
+                    if (last4) {
+                        // saved card selected, payment will be done server-side
+                        component.isPayButtonVisible(true);
+                    } else {
+                        // saved card not selected, payment will be triggered from Simplify iframe
+                        component.isPayButtonVisible(false);
+                    }
+                    return true;
+                }
+            },
 
             /** Initializes the payment method */
             initObservable: function () {
@@ -63,7 +90,7 @@ define(
 
 
             /** Unique code of the payment method */
-            getCode: function() {
+            getCode: function() { 
                 return "simplifycommerce";
             },
 
@@ -85,7 +112,16 @@ define(
                 }
                 configuration = configuration || { isValid: false }; 
                 configuration.isCustomerLoggedIn = customer.isLoggedIn();
+
+                if (configuration.canSaveCard && configuration.isCustomerLoggedIn && configuration.customer) {
+                    __.each(configuration.customer.cards, function(card) { 
+                        component.savedCards.items.push(card); 
+                        component.savedCards.available(true);
+                    });
+                }
+               
                 log.setDeveloperMode(configuration.isDeveloperMode);
+                log.debug("configuration", configuration);
                 return configuration;
             },
 
@@ -140,8 +176,22 @@ define(
 
 
             /** Sends payment for handling to the server side */
-            submitOrder: function(payment) {
-                if (payment && payment["cc-token"]) {
+            submitOrder: function(source) {
+                var payment = null;
+                if (source.placeOrder) {
+                    payment = {
+                        "cc-use-card": component.savedCards.selectedCard()
+                    };
+                    if (payment["cc-use-card"] === "other")
+                        payment["cc-use-card"] = null;
+                }
+                else {
+                    payment = source || {};
+                    payment["cc-save"] = Boolean(component.isStoreCreditCardChecked());
+                }
+
+                log.debug("Submitting payment", payment);
+                if (payment["cc-token"] || payment["cc-use-card"]) {
                     $.when(placeOrderAction({
                         "method": quote.paymentMethod().method,
                         "additional_data": payment
@@ -321,8 +371,6 @@ define(
                         }
                         var total = quote.totals();
                         var billingAddress = quote.billingAddress() || {};
-                        log.debug("quote", quote);
-                        log.debug("billingAddress", billingAddress);
                         payment = {
                             scKey: clean(configuration.publicAPIKey),
                             color: "#1979C3",
@@ -332,10 +380,10 @@ define(
                             description: clean(configuration.storeName, "Magento Store"),
                             operation: clean(operation),
                             customerName: configuration.isCustomerLoggedIn ? 
-                                            clean(configuration.customerName, billingAddress.company) : 
+                                            clean(configuration.customer.name, billingAddress.company) : 
                                             clean(concatenate(billingAddress.firstname, billingAddress.lastname), billingAddress.company),
                             customerEmail: configuration.isCustomerLoggedIn ? 
-                                            clean(configuration.customerEmail) : 
+                                            clean(configuration.customer.email) : 
                                             clean(quote.guestEmail),
                             reference: "#" + clean(quote.getQuoteId()),
                             amount: clean(total.grand_total * 100, 0),
@@ -348,7 +396,6 @@ define(
                         };
                         payment.isValid = payment.amount > 0 && payment.currency;
                     }
-                    log.debug("toSimplifyPayment result", payment);
                     return payment;
                 },
 

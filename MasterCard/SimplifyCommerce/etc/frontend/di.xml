@@ -13,7 +13,7 @@
         <arguments>
             <argument name="configProviders" xsi:type="array">
                 <item name="simplifycommerce_config_provider" xsi:type="object">MasterCard\SimplifyCommerce\Model\ConfigProvider</item>
-                <item name="simplifycommerce_iframe_config_provider" xsi:type="object">MasterCard\SimplifyCommerce\Model\Config\SimplifyCommerceConfigProvider</item>
+                <item name="simplifycommerce_iframe_config_provider" xsi:type="object">MasterCard\SimplifyCommerce\Model\SimplifyCommerceConfigProvider</item>
             </argument>
         </arguments>
     </type>

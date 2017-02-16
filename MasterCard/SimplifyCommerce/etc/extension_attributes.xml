@@ -1,8 +1,0 @@
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
-    <extension_attributes for="Magento\Customer\Api\Data\CustomerInterface">
-        <attribute code="simplifycommerce_customer_id" type="string"></attribute>
-        <attribute code="simplifycommerce_card_number" type="string"></attribute>
-        <attribute code="simplifycommerce_card_expiration_month" type="int"></attribute>
-        <attribute code="simplifycommerce_card_expiration_year" type="int"></attribute>
-    </extension_attributes>
-</config>

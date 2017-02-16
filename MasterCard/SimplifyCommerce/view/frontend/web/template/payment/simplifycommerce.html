@@ -24,10 +24,66 @@
             </div>
         <!--/ko-->
 
+        <!-- Saved credit cards -->
+        <!-- ko if: savedCards.available -->
+            <div class="simplifycommerce-cards-title">
+                Select one of your credit cards:
+            </div>
+            <!-- ko foreach: savedCards.items -->            
+            <div class="simplifycommerce-card field choice">
+                <input type="radio" name="simplifycommerce-card" class="radio"
+                    data-bind="attr: {
+                        id: $parent.savedCards.getCardId(last4), 
+                        value: last4
+                    },
+                    click: $parent.savedCards.cardSelected,
+                    checked: $parent.savedCards.selectedCard"/>
+                <label data-bind="attr: {'for': $parent.savedCards.getCardId(last4) }" class="label">
+                    <span data-bind="text: $parent.savedCards.getCardTitle(type, last4)"></span>
+                </label>
+            </div>
+            <!--/ko-->
+            <!-- ko if: savedCards.selectedCard -->
+            <div class="simplifycommerce-card simplifycommerce-card-other field choice" 
+                data-bind="visible: savedCards.selectedCard() != 'other'">
+                <input type="radio" name="simplifycommerce-card" class="radio" 
+                    data-bind="attr: {
+                        id: savedCards.getCardId('other'), 
+                        value: 'other'                        
+                    },
+                    click: savedCards.cardSelected,
+                    checked: savedCards.selectedCard"/>
+                <label data-bind="attr: {'for': savedCards.getCardId('other') }" class="label">
+                    Enter a new card
+                </label>
+            </div>
+            <!--/ko-->
+            <div class="simplifycommerce-cards-title"
+                data-bind="visible: savedCards.selectedCard() == 'other'">
+                or enter a new credit card below:
+            </div>
+        <!--/ko-->
+        
+
         <!-- Credit card form -->
-        <form class="form" id="simplifycommerce-form">
-            <!-- ko if: configuration.customerSavedCreditCard -->
-            <!-- CUSTOMER HAS CC -->
+        <form class="form simplifycommerce-form" data-bind="visible: savedCards.selectedCard() == 'other'">
+            <!-- ko if: configuration.canSaveCard -->
+            <div class="field">
+              <div class="control">
+                  <input type="checkbox" name="payment[cc_save]" class="input-checkbox" value="1" id="simplifycommerce_cc_save"
+                         data-bind="
+                            checked: isStoreCreditCardChecked,
+                            attr: {
+                                autocomplete: off,
+                                id: getCode() + '_cc_save',
+                                title: $t('Save Credit Card'),
+                                'data-container': getCode() + '-cc-save'
+                            }"/>
+                  <label data-bind="attr: {for: getCode() + '_cc_save'}" class="label">
+                      <span>Save credit card for future use</span>
+                  </label>
+                </div>
+            </div>
             <!-- /ko -->
 
             <!-- IFRAME with Simplify Hosted Payments form -->
@@ -49,21 +105,6 @@
                 <!-- ko template: 'Magento_Payment/payment/cc-form' --><!-- /ko -->
             <!-- /ko -->
 
-            <!-- ko if: configuration.canSaveCard -->
-            <div class="field">
-              <div class="control">
-                  <input type="checkbox" name="payment[cc_save]" class="input-checkbox" value="1" id="simplifycommerce_cc_save"
-                         data-bind="attr: {
-                                          autocomplete: off,
-                                          id: getCode() + '_cc_save',
-                                          title: $t('Save Credit Card'),
-                                          'data-container': getCode() + '-cc-save'"/>
-                  <label data-bind="attr: {for: getCode() + '_cc_save'}" class="label">
-                      <span>Save Credit Card</span>
-                  </label>
-                </div>
-            </div>
-            <!-- /ko -->
         </form>
 
         <div class="checkout-agreements-block">
@@ -80,9 +121,9 @@
                         class="action primary checkout"
                         type="submit"
                         data-bind="
-                            click: placeOrder,
+                            click: submitOrder,
                             attr: { title: $t('Place Order') },
-                            visible: !configuration.hostedPaymentsEnabled,
+                            visible: isPayButtonVisible(),
                             css: { disabled: !isPlaceOrderActionAllowed() }
                         ">
                     <span data-bind="text: $t('Place Order')"></span>
