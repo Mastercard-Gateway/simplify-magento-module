@@ -411,7 +411,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $result = null;
                 $request = $requestBuilder->getCustomerCreateRequest($this->_customer);
                 if ($request) {
-                    $this->log("Customer request: " . var_export($request, true));
+                    $this->log("Customer request", $request);
                     $result = SC_Customer::createCustomer($request);
                 }
                 if ($result && $result->id) {
@@ -445,9 +445,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $result = false;
         }
         if ($result) {
-            $this->log("Merchant account valid, public key: " . $this->_publicKey);
+            $this->log("Merchant account valid", [ "publicKey" => $this->_publicKey]);
         } else {
-            $this->log("Cannot validate merchant account, public key: " . $this->_publicKey);
+            $this->log("Cannot validate merchant account", [ "publicKey" => $this->_publicKey]);
         }
         return $result;
     }
@@ -487,25 +487,25 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             // Authorize payment
             $request = $requestBuilder->getPaymentCreateRequest();
             if ($request) {
-                $this->log("Authorization request: " . var_export($request, true));
+                $this->log("Authorization request", $request);
                 $result = SC_Authorization::createAuthorization($request);
             }
         }
         catch (Exception $e) {
             $status = $e->getMessage();
-            $this->log("Authorization failed: " . $status);
+            $this->log("Authorization failed", $status);
             throw new \Magento\Framework\Exception\LocalizedException(__("Authorization failes: " . $status));
         }
 
         if ($result) {
             if ($result->paymentStatus == "APPROVED") {
-                $this->log("Authorization approved, ID: " . $result->id);
+                $this->log("Authorization approved", $result->id);
                 $payment->setTransactionId($result->id);
                 // $payment->setParentTransactionId($result->id);
                 $payment->setCcLast4($result->card->last4);
                 $payment->setIsTransactionClosed(false);
             } else {
-                $this->log("Authorization not approved: " . $result->paymentStatus);
+                $this->log("Authorization not approved", $result->paymentStatus);
                 throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
             }
         }
@@ -558,19 +558,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $request = $requestBuilder->getPaymentCreateRequest();
             if ($request) {
                 $parentTransactionId = $requestBuilder->parentTransactionId;
-                $this->log("Payment request: " . var_export($request, true));
+                $this->log("Payment request", $request);
                 $result = SC_Payment::createPayment($request);
             }
         }
         catch (Exception $e) {
             $status = $e->getMessage();
-            $this->log("Payment failed: " . $status);
+            $this->log("Payment failed", $status);
             throw new \Magento\Framework\Exception\LocalizedException(__("Payment failed: " . $status));
         }
 
         if ($result) {
             if ($result->paymentStatus == "APPROVED") {
-                $this->log("Payment approved, ID: " . $result->id);
+                $this->log("Payment approved", $result->id);
                 $payment->setTransactionId($result->id);
                 if ($parentTransactionId) {
                     $payment->setParentTransactionId($parentTransactionId);
@@ -581,7 +581,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $payment->setIsTransactionClosed(true);
                 //$payment->setShouldCloseParentTransaction(true);               
             } else {
-                $this->log("Payment not approved: " . $result->paymentStatus);
+                $this->log("Payment not approved", $result->paymentStatus);
                 throw new \Magento\Framework\Exception\LocalizedException(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));
             }
         }
@@ -613,7 +613,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         }
         catch (Exception $e) { 
             $status = $e->getMessage();
-            $this->log("Void failed: " . $status);
+            $this->log("Void failed", $status);
             throw new \Magento\Framework\Exception\LocalizedException(__("Void failed: " . $refundStatus));
         }
 
@@ -656,13 +656,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $requestBuilder = new SC_RequestBuilder($payment, $amount);
             $request = $requestBuilder->getRefundCreateRequest(null);
             if ($request) {
+                $this->log("Refund request", $request);
                 $parentTransactionId = $requestBuilder->parentTransactionId;
                 $result = SC_Refund::createRefund($request);
             }
         }
         catch (Exception $e) { 
             $status = $e->getMessage();
-            $this->log("Refund failed: " . $refundStatus);
+            $this->log("Refund failed", $refundStatus);
             throw new \Magento\Framework\Exception\LocalizedException(__("Refund failed: " . $status));
         }
 
@@ -672,7 +673,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 ->setParentTransactionId($parentTransactionId)
                 ->setIsTransactionClosed(true)
                 ->setShouldCloseParentTransaction(true);
-            $this->log("Refund approved, ID: " . $result->id);
+            $this->log("Refund approved", $result->id);
         }
         else {            
             $this->log("Refund not executed");
@@ -723,7 +724,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         if ($quote) {
             $currencyCode = $quote->getBaseCurrencyCode();
             if (!$this->isCurrencySupported($currencyCode)) {
-                $this->log("Unsupported currency " . $currencyCode);
+                $this->log("Unsupported currency", $currencyCode);
                 return false;
             }
         }
