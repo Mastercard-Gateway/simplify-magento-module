@@ -201,7 +201,7 @@ define(
                 
                 // Payment is triggered by hosted payment form or saved credit card is used,
                 // therefore handle the payment using custom method
-                payment = source || {};
+                payment = payment || source || {};
                 // Check if card should be stored, ignore if card has already been stored 
                 if (payment["cc-last4"] && Boolean(component.isStoreCreditCardChecked())) {
                     if (!__.find(component.savedCards.items, { last4: payment["cc-last4"] })) {
