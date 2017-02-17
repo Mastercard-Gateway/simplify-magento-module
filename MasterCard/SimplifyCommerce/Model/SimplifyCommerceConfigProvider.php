@@ -30,7 +30,7 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
 
         SC::$publicKey = $this->getPublicAPIKey();
         SC::$privateKey = $this->getPrivateAPIKey();
-        SC::$userAgent = "Magento-2.1.0";
+        SC::$userAgent = "Magento-2.1.6";
     }
 
     /** Returns custom configuration values */
@@ -60,7 +60,7 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
     /** Retrieves stored credit cards associated with the current customer */
     public function getSavedCreditCards($customer) {        
         $savedCreditCards = [];
-        if ($this->getConfigValue("customer_save_credit_card") && $customer && $customer->getEmail()) {
+        if ($this->canSaveCard() && $customer && $customer->getEmail()) {
             $customers = SC_Customer::listCustomer([
                 "filter" => [
                     "text"=> $customer->getEmail()
@@ -102,10 +102,13 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
         return $this->getConfigValue("private_key");
     }
 
-    /** Returns true if saving customer cards is enabled */
+    /** Returns true if saving customer cards is enabled in settings. 
+        The setting will only apply when hosted payments are used! */
     private function canSaveCard() {
         $customer = $this->currentCustomer->getCustomerId();
-        return !is_null($customer) && $this->getConfigValue("customer_save_credit_card");
+        return !is_null($customer) && 
+               (bool)$this->getConfigValue("customer_save_credit_card") &&
+               (bool)$this->getConfigValue("simplify_hostedpayments");
     }
 
     /** Returns Simplify Customer ID for the currently logged in customer.

@@ -35,6 +35,14 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Credit card input form from Simplify Commerce will be used, for better security and PCI compliance</comment>
                 </field>
+                <field id="customer_save_credit_card" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="120" translate="label" type="select">
+                    <label>Customer can save credit card</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Allow customers credit card tokens to be saved for future use.</comment>
+                    <depends>
+                        <field id="simplify_hostedpayments">1</field>
+                    </depends>
+                </field>
                 <field id="cctypes" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="100" translate="label" type="multiselect">
                     <label>Credit Card Types</label>
                     <source_model>MasterCard\SimplifyCommerce\Model\Source\Cctype</source_model>
@@ -54,11 +62,6 @@
                     <depends>
                         <field id="allowspecific">1</field>
                     </depends>
-                </field>
-                <field id="customer_save_credit_card" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="120" translate="label" type="select">
-                    <label>Customer can save credit card</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Allow customers credit card tokens to be saved for future use.</comment>
                 </field>
             </group>
         </section>

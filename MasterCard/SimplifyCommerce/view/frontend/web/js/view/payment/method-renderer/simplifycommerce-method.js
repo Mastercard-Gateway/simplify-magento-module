@@ -113,11 +113,17 @@ define(
                 configuration = configuration || { isValid: false }; 
                 configuration.isCustomerLoggedIn = customer.isLoggedIn();
 
-                if (configuration.canSaveCard && configuration.isCustomerLoggedIn && configuration.customer) {
+                if (configuration.canSaveCard && 
+                    configuration.isCustomerLoggedIn && 
+                    configuration.customer) {
                     __.each(configuration.customer.cards, function(card) { 
                         component.savedCards.items.push(card); 
                         component.savedCards.available(true);
                     });
+                }
+
+                if (!configuration.hostedPaymentsEnabled) {
+                    component.isPayButtonVisible(true);
                 }
                
                 log.setDeveloperMode(configuration.isDeveloperMode);
@@ -178,20 +184,32 @@ define(
             /** Sends payment for handling to the server side */
             submitOrder: function(source) {
                 var payment = null;
-                if (source.placeOrder) {
-                    payment = {
-                        "cc-use-card": component.savedCards.selectedCard()
+                if (source.placeOrder) { // Payment is triggered by default PLACE ORDER button
+                    // Check if payment with one of the saved credit cards
+                    payment = { 
+                        "cc-use-card": component.savedCards.selectedCard() 
                     };
-                    if (payment["cc-use-card"] === "other")
-                        payment["cc-use-card"] = null;
+                    if (!payment["cc-use-card"] || payment["cc-use-card"] === "other")
+                        delete payment["cc-use-card"];
+                    log.debug("Submitting payment", payment);
+                    // If not, use default order processing
+                    if (!payment["cc-use-card"]) {
+                        this.placeOrder();
+                        return;
+                    }
                 }
-                else {
-                    payment = source || {};
-                    payment["cc-save"] = Boolean(component.isStoreCreditCardChecked());
+                
+                // Payment is triggered by hosted payment form or saved credit card is used,
+                // therefore handle the payment using custom method
+                payment = source || {};
+                // Check if card should be stored, ignore if card has already been stored 
+                if (payment["cc-last4"] && Boolean(component.isStoreCreditCardChecked())) {
+                    if (!__.find(component.savedCards.items, { last4: payment["cc-last4"] })) {
+                        payment["cc-save"] = true;
+                    }
                 }
-
-                log.debug("Submitting payment", payment);
                 if (payment["cc-token"] || payment["cc-use-card"]) {
+                    log.debug("Submitting payment", payment);
                     $.when(placeOrderAction({
                         "method": quote.paymentMethod().method,
                         "additional_data": payment
@@ -205,6 +223,7 @@ define(
                         component.showError($t("There was an error while submitting the order."));
                     });
                 } else {
+                    screenOverlay.stopLoader();
                     component.showError($t("Incomplete payment data, cannot submit the order"));
                 }
             },
@@ -407,7 +426,7 @@ define(
                         result = {
                             "success": handler.hasPaymentSucceeded(handler.operation, payment),
                             "cc-token": clean(payment.cardToken),
-                            "cc-number": clean(payment.card.last4),
+                            "cc-last4": clean(payment.card.last4),
                             "cc-expiration-month": payment.card.expMonth,
                             "cc-expiration-year": payment.card.expYear,
                             "cc-type": clean(handler.toMagentoCardType(payment.card.type))

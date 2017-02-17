@@ -3,6 +3,7 @@
     <default>
         <payment>
             <simplifycommerce>
+                <debug>1</debug>
                 <active>1</active>
                 <model>MasterCard\SimplifyCommerce\Model\Payment</model>
                 <payment_action>authorize_capture</payment_action>
@@ -16,7 +17,7 @@
                 <sort_order>1</sort_order>
                 <simplify_hostedpayments>1</simplify_hostedpayments>
                 <min_order_total>0.50</min_order_total>
-                <customer_save_credit_card>false</customer_save_credit_card>
+                <customer_save_credit_card>0</customer_save_credit_card>
             </simplifycommerce>
         </payment>
     </default>

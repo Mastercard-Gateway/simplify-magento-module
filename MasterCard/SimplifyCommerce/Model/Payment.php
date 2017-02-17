@@ -2,7 +2,6 @@
 
 namespace MasterCard\SimplifyCommerce\Model;
 
-require_once("Log.php");
 require_once("Utilities.php");
 require_once("Simplify.php");
 
@@ -64,7 +63,7 @@ class SC_RequestBuilder
             $this->description = $this->email;
             $this->reference = "#" . $this->orderId;
             $this->cardToken = $payment->getAdditionalInformation("cc-token");
-            $this->last4 = $payment->getAdditionalInformation("cc-number");
+            $this->last4 = $payment->getAdditionalInformation("cc-last4");
             $this->saveCard = $payment->getAdditionalInformation("cc-save");
             $this->useSavedCard = $payment->getAdditionalInformation("cc-use-card");
         }
@@ -248,7 +247,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     const RE_NUMBER = "/[^\d]/";
 
     protected $_code = self::CODE;
-    protected $version = "1.0.0";
+    protected $version = "2.1.6";
 
     /** Feature availability */
     protected $_isGateway = false;
@@ -265,7 +264,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     protected $_paymentAction = null;
     protected $_savedCards = null;
 
-    protected $_log = null;
     protected $_developerMode = false;
     protected $_storeManager = null;
     protected $_customer = null;
@@ -313,9 +311,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         if ($currentCustomer->getCustomerId())       
             $this->_customer = $customerRepository->getById($currentCustomer->getCustomerId());
 
-        // Initialize custom Simplify log
         $this->_developerMode = \MasterCard\SimplifyCommerce\Utilities::isDeveloperMode();
-        $this->_log = new \MasterCard\SimplifyCommerce\Log($this->_developerMode, BP . "/var/log/simplify.log");
 
         // Fetch Simplify Commerce plugin configuration
         $this->_minAmount = $this->getConfigData('min_order_total');
@@ -327,22 +323,39 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // Configure Simplify Commerce API
         SC::$publicKey = $this->_publicKey;
         SC::$privateKey = $this->_privateKey;
-        SC::$userAgent = "Magento-2.1.0";
+        SC::$userAgent = "Magento-" + $this->version;
 
         // Fetch saved customer credit cards   
         if ($this->_customer) {
             $this->_savedCards = $this->getSavedCreditCards();
-        }
+        } 
 
-        $this->_log->debug("Payment module initialized");
+        $this->log("Payment module initialized");
         // $this->validateSimplifyCommerceAccount();
+    }
+
+
+    /** Outputs message and optional data to debug log */
+    public function log($message, $data = null) {
+        $this->_logger->debug([
+            "message" => $message,
+            "data" => $data
+        ], null, $this->_developerMode);
+    }
+
+
+    /** Returns true if saving customer cards is enabled in settings. 
+        The setting will only apply when hosted payments are used! */
+    public function canSaveCard() {
+        return (bool)$this->getConfigValue("customer_save_credit_card") &&
+               (bool)$this->getConfigValue("simplify_hostedpayments");
     }
 
 
     /** Retrieves stored credit cards associated with the current customer */
     public function getSavedCreditCards() {
         $savedCreditCards = [];
-        if ($this->_customer && $this->_customer->getEmail()) {
+        if ($this->_customer && $this->_customer->getEmail() && $this->canSaveCard()) {
             $customers = SC_Customer::listCustomer([
                 "filter" => [
                     "text"=> $this->_customer->getEmail()
@@ -389,7 +402,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
 
         // Proceed if saving cards enabled in store configuration, customer is logged in 
         // and all data required for saving the card available in the payment
-        if ($this->_customer && $requestBuilder->canSaveCard()) {
+        if ($this->_customer && $requestBuilder->canSaveCard() && $this->canSaveCard()) {
             // ... but ignore if the specified card has already been saved
             if ($this->_savedCards && isset($this->_savedCards[$requestBuilder->last4])) {
                 $savedCreditCard = $this->_savedCards[$requestBuilder->last4];
@@ -398,7 +411,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 $result = null;
                 $request = $requestBuilder->getCustomerCreateRequest($this->_customer);
                 if ($request) {
-                    $this->_log->debug("Customer request: " . var_export($request, true));
+                    $this->log("Customer request: " . var_export($request, true));
                     $result = SC_Customer::createCustomer($request);
                 }
                 if ($result && $result->id) {
@@ -432,9 +445,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $result = false;
         }
         if ($result) {
-            $this->_log->debug("Merchant account valid, public key: " . $this->_publicKey);
+            $this->log("Merchant account valid, public key: " . $this->_publicKey);
         } else {
-            $this->_log->error("Cannot validate merchant account, public key: " . $this->_publicKey);
+            $this->log("Cannot validate merchant account, public key: " . $this->_publicKey);
         }
         return $result;
     }
@@ -446,47 +459,58 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
-        $this->_log->debug("Authorizing payment ...");
+        $this->log("Authorizing payment ...");
 
         $result = null;
         try {
             $requestBuilder = new SC_RequestBuilder($payment, $amount);            
 
-            if ($requestBuilder->canSaveCard()) {
-                $savedCard = $this->saveCreditCard($payment);
+            // Use saved card if selected
+            if ($requestBuilder->useSavedCard) {
+                $savedCard = $this->findCreditCard($requestBuilder->useSavedCard);
                 if ($savedCard) {
-                    // Pass card identifier to request builder, so that the payment is performed with it.
-                    // Card token has already been used for saving the card, so payment with it would fail.
                     $requestBuilder->cardId = $savedCard["id"];
                 }
             }
+            else {
+                // Save card if required
+                if ($requestBuilder->canSaveCard()) {
+                    $savedCard = $this->saveCreditCard($payment);
+                    if ($savedCard) {
+                        // Pass card identifier to request builder, so that the payment is performed with it.
+                        // Card token has already been used for saving the card, so payment with it would fail.
+                        $requestBuilder->cardId = $savedCard["id"];
+                    }
+                }
+            }
 
+            // Authorize payment
             $request = $requestBuilder->getPaymentCreateRequest();
             if ($request) {
-                $this->_log->debug("Authorization request: " . var_export($request, true));
+                $this->log("Authorization request: " . var_export($request, true));
                 $result = SC_Authorization::createAuthorization($request);
             }
         }
         catch (Exception $e) {
             $status = $e->getMessage();
-            $this->_log->error("Authorization failed: " . $status);
+            $this->log("Authorization failed: " . $status);
             throw new \Magento\Framework\Exception\LocalizedException(__("Authorization failes: " . $status));
         }
 
         if ($result) {
             if ($result->paymentStatus == "APPROVED") {
-                $this->_log->debug("Authorization approved, ID: " . $result->id);
+                $this->log("Authorization approved, ID: " . $result->id);
                 $payment->setTransactionId($result->id);
-                $payment->setParentTransactionId($result->id);
+                // $payment->setParentTransactionId($result->id);
                 $payment->setCcLast4($result->card->last4);
                 $payment->setIsTransactionClosed(false);
             } else {
-                $this->_log->warning("Authorization not approved: " . $result->paymentStatus);
+                $this->log("Authorization not approved: " . $result->paymentStatus);
                 throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
             }
         }
         else {            
-            $this->_log->error("Authorization not processed");
+            $this->log("Authorization not processed");
             throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not processed"));
         }
 
@@ -503,13 +527,15 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     }
 
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        $this->_log->debug("Capturing payment ...");
+        $this->log("Capturing payment ...");
 
         $result = null;
         $requestBuilder = null;
+        $parentTransactionId = null;
         try {
             $requestBuilder = new SC_RequestBuilder($payment, $amount);
 
+            // Use saved card if selected
             if ($requestBuilder->useSavedCard) {
                 $savedCard = $this->findCreditCard($requestBuilder->useSavedCard);
                 if ($savedCard) {
@@ -517,6 +543,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
                 }
             }
             else {
+                // Save card if required
                 if ($requestBuilder->canSaveCard()) {
                     $savedCard = $this->saveCreditCard($payment);
                     if ($savedCard) {
@@ -530,30 +557,36 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             // Create payment            
             $request = $requestBuilder->getPaymentCreateRequest();
             if ($request) {
-                $this->_log->debug("Payment request: " . var_export($request, true));
+                $parentTransactionId = $requestBuilder->parentTransactionId;
+                $this->log("Payment request: " . var_export($request, true));
                 $result = SC_Payment::createPayment($request);
             }
         }
         catch (Exception $e) {
             $status = $e->getMessage();
-            $this->_log->error("Payment failed: " . $status);
+            $this->log("Payment failed: " . $status);
             throw new \Magento\Framework\Exception\LocalizedException(__("Payment failed: " . $status));
         }
 
         if ($result) {
             if ($result->paymentStatus == "APPROVED") {
-                $this->_log->debug("Payment approved, ID: " . $result->id);
+                $this->log("Payment approved, ID: " . $result->id);
                 $payment->setTransactionId($result->id);
+                if ($parentTransactionId) {
+                    $payment->setParentTransactionId($parentTransactionId);
+                } else {
+                    $payment->setParentTransactionId($result->id);
+                }
                 $payment->setCcLast4($result->card->last4);
-                $payment->setIsTransactionClosed(false);
-                $payment->setShouldCloseParentTransaction(true);               
+                $payment->setIsTransactionClosed(true);
+                //$payment->setShouldCloseParentTransaction(true);               
             } else {
-                $this->_log->warning("Payment not approved: " . $result->paymentStatus);
+                $this->log("Payment not approved: " . $result->paymentStatus);
                 throw new \Magento\Framework\Exception\LocalizedException(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));
             }
         }
         else {            
-            $this->_log->error("Payment not executed");
+            $this->log("Payment not executed");
             throw new \Magento\Framework\Exception\LocalizedException(__("Payment not executed"));
         }
 
@@ -566,7 +599,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
-        $this->_log->debug("Voiding payment ...");
+        $this->log("Voiding payment ...");
 
         $result = false;
         try {
@@ -580,17 +613,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         }
         catch (Exception $e) { 
             $status = $e->getMessage();
-            $this->_log->error("Void failed: " . $status);
+            $this->log("Void failed: " . $status);
             throw new \Magento\Framework\Exception\LocalizedException(__("Void failed: " . $refundStatus));
         }
 
         if ($result) {
             $payment->setIsTransactionClosed(true);
             $payment->setShouldCloseParentTransaction(true);
-            $this->_log->debug("Void approved");
+            $this->log("Void approved");
         }
         else {            
-            $this->_log->error("Void not executed");
+            $this->log("Void not executed");
             throw new \Magento\Framework\Exception\LocalizedException(__("Void not executed"));
         }
 
@@ -607,32 +640,50 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /** 
      * Refund the payment 
      */
+    public function canRefund()
+    {
+        $this->log("Can refund? " . ($this->_canRefund ? "YES" : "NO"));
+        $payment = $this->getInfoInstance();
+        $invoice = $payment->getInvoice();
+        if ($invoice) {
+            $this->log("Invoice transaction ID: " . $invoice->getTransactionId());
+        }
+        else {
+            $this->log("No invoice found");
+        }
+        return $this->_canRefund;
+    }
+
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        $this->_log->debug("Refunding payment ...");
+        $this->log("Refunding payment ...");
 
         $result = null;
         $status = __("Refund not approved");
+        $parentTransactionId = null;
         try {
             $requestBuilder = new SC_RequestBuilder($payment, $amount);
             $request = $requestBuilder->getRefundCreateRequest(null);
             if ($request) {
+                $parentTransactionId = $requestBuilder->parentTransactionId;
                 $result = SC_Refund::createRefund($request);
             }
         }
         catch (Exception $e) { 
             $status = $e->getMessage();
-            $this->_log->error("Refund failed: " . $refundStatus);
+            $this->log("Refund failed: " . $refundStatus);
             throw new \Magento\Framework\Exception\LocalizedException(__("Refund failed: " . $status));
         }
 
         if ($result) {
-            $payment->setTransactionId($result->id);
-            $payment->setIsTransactionClosed(true);
-            $payment->setShouldCloseParentTransaction(true);
-            $this->_log->debug("Refund approved, ID: " . $result->id);
+            $payment
+                ->setTransactionId($result->id)
+                ->setParentTransactionId($parentTransactionId)
+                ->setIsTransactionClosed(true)
+                ->setShouldCloseParentTransaction(true);
+            $this->log("Refund approved, ID: " . $result->id);
         }
         else {            
-            $this->_log->error("Refund not executed");
+            $this->log("Refund not executed");
             throw new \Magento\Framework\Exception\LocalizedException(__("Refund not executed"));
         }
 
@@ -646,11 +697,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null) {
         // Simplify Commerce API keys required
         if (!$this->_publicKey) {
-            $this->_log->debug("Payment method not available: public API key not specified");
+            $this->log("Payment method not available: public API key not specified");
             return false;
         }
         if (!$this->_privateKey) {
-            $this->_log->debug("Payment method not available: private API key not specified");
+            $this->log("Payment method not available: private API key not specified");
             return false;
         }
 
@@ -658,7 +709,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         if ($quote) {
             $total = $quote->getBaseGrandTotal();
             if ($total < $this->_minAmount || ($this->_maxAmount && $total > $this->_maxAmount)) {
-                $this->_log->debug("Payment method not available: order value out of range");
+                $this->log("Payment method not available: order value out of range");
                 return false;
             }
         } 
@@ -666,21 +717,21 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         // Some credit card types must be selected
         $ccTypes = explode(',', $this->getConfigData("cctypes"));
         if (!($ccTypes || $ccTypes.length == 0)) {
-            $this->_log->debug("No credit cards enabled in store configuration");
+            $this->log("No credit cards enabled in store configuration");
             return false;
         }
 
         // Some currencies must be selected
         $currencies = explode(',', $this->getConfigData("currencies"));
         if (!($currencies || $currencies.length == 0)) {
-            $this->_log->debug("No currencies enabled in store configuration");
+            $this->log("No currencies enabled in store configuration");
             return false;
         }
 
         if ($quote) {
             $currencyCode = $quote->getBaseCurrencyCode();
             if (!$this->isCurrencySupported($currencyCode)) {
-                $this->_log->debug("Unsupported currency " . $currencyCode);
+                $this->log("Unsupported currency " . $currencyCode);
                 return false;
             }
         }
@@ -724,8 +775,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             if (isset($additionalData["cc-token"])) {
                 $payment->setAdditionalInformation("cc-token", $additionalData["cc-token"]);
             }
-            if (isset($additionalData["cc-number"])) {
-                $payment->setAdditionalInformation("cc-number", $additionalData["cc-number"]);
+            if (isset($additionalData["cc-last4"])) {
+                $payment->setAdditionalInformation("cc-last4", $additionalData["cc-last4"]);
             }
             if (isset($additionalData["cc-type"])) {
                 $payment->setAdditionalInformation("cc-type", $additionalData["cc-type"]);
@@ -764,4 +815,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         }
         return $result;
     }
+
+
 }
+
