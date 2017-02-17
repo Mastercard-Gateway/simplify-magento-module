@@ -347,8 +347,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     /** Returns true if saving customer cards is enabled in settings. 
         The setting will only apply when hosted payments are used! */
     public function canSaveCard() {
-        return (bool)$this->getConfigValue("customer_save_credit_card") &&
-               (bool)$this->getConfigValue("simplify_hostedpayments");
+        return (bool)$this->getConfigData("customer_save_credit_card") &&
+               (bool)$this->getConfigData("simplify_hostedpayments");
     }
 
 
@@ -642,17 +642,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function canRefund()
     {
-        $this->log("Can refund? " . ($this->_canRefund ? "YES" : "NO"));
-        $payment = $this->getInfoInstance();
-        $invoice = $payment->getInvoice();
-        if ($invoice) {
-            $this->log("Invoice transaction ID: " . $invoice->getTransactionId());
-        }
-        else {
-            $this->log("No invoice found");
-        }
         return $this->_canRefund;
     }
+
 
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
         $this->log("Refunding payment ...");
