@@ -29,6 +29,21 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
     protected $scopeConfig = null;
     protected $savedCards = null;
     protected $cache = null;
+    protected $confidentialValues = [
+        "privateKey",
+        "cc_number",
+        "cc_cid",
+        "cc_expiration_year",
+        "cc_expiration_month",
+        "cid",
+        "expYear",
+        "expMonth",
+        "number",
+        "cvc",
+        "year",
+        "month"
+    ];                   
+
 
     public function __construct(
         \Magento\Framework\App\State $appState,
@@ -58,10 +73,32 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
 
     /** Outputs message and optional data to debug log */
     private function log($message, $data = null) {
+        // clean confidential values
+        $data = $this->obfuscate($data);
         $this->logger->debug([
             "message" => "Simplify Commerce Gateway: " . $message,
             "data" => $data
         ], null, $this->developerMode);
+    }
+
+    /** Recursively obfuscated confidential values in the specified data object */
+    private function obfuscate($data) {
+        if ($data) {
+            $data = unserialize(serialize($data));
+            if (is_array($data) || is_object($data)) {
+                foreach ($data as $key => $value) {
+                    if ($key != "0" && in_array($key, $this->confidentialValues)) {
+                        $data[$key] = "****";
+                    }
+                    else {
+                        if (is_array($value) || is_object($value)) {
+                            $data[$key] = $this->obfuscate($data[$key]);
+                        }
+                    }
+                }
+            } 
+        }
+        return $data;
     }
 
 
@@ -160,6 +197,8 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
                     throw new \Magento\Framework\Exception\LocalizedException(__("Cannot validate Simplify Commerce merchant account"));
                 }
             }
+
+            // $this->log("Initialized", $this->configuration);
         }
     }
 
@@ -177,6 +216,7 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
         } 
         else {
             return [
+                "version" => $this->getVersion(),
                 "publicKey" => $this->getConfigValue("public_key"),
                 "privateKey" => $this->getConfigValue("private_key"),
                 "paymentAction" => $this->getConfigValue("payment_action"),
@@ -240,7 +280,7 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
                     foreach ($customers->list as $customer) {
                         if ($customer->card) {
                             $card = [
-                                "id" => $customer->id,
+                                "cid" => $customer->id,
                                 "type" => $customer->card->type,
                                 "last4" => $customer->card->last4,
                                 "year" => $customer->card->expYear,
@@ -295,7 +335,7 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
                 }
                 if ($result && $result->id) {
                     $savedCreditCard = [
-                        "id" => $result->id,
+                        "cid" => $result->id,
                         "last4" => $result->card->last4,
                         "year" => $result->card->expYear,
                         "month" => $result->card->expMonth,
@@ -333,9 +373,6 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
             if ($requestBuilder->useSavedCard) {
                 // Use saved card if selected
                 $savedCard = $this->getSavedCreditCard($requestBuilder->useSavedCard);
-                if ($savedCard) {
-                    $requestBuilder->cardId = $savedCard["id"];
-                }
             }
             else {
                 // Save card if user asked
@@ -346,7 +383,7 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
             // Pass card identifier to request builder, so that the payment is performed with it.
             // Card token has already been used for saving the card, so payment with it would fail.
             if ($savedCard) {
-                $requestBuilder->cardId = $savedCard["id"];
+                $requestBuilder->cardId = $savedCard["cid"];
             }
 
             // Authorize payment
@@ -395,9 +432,6 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
             if ($requestBuilder->useSavedCard) {
                 // Use saved card if selected
                 $savedCard = $this->getSavedCreditCard($requestBuilder->useSavedCard);
-                if ($savedCard) {
-                    $requestBuilder->cardId = $savedCard["id"];
-                }
             }
             else {
                 // Save card if user asked
@@ -408,7 +442,7 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
             // Pass card identifier to request builder, so that the payment is performed with it.
             // Card token has already been used for saving the card, so payment with it would fail.
             if ($savedCard) {
-                $requestBuilder->cardId = $savedCard["id"];
+                $requestBuilder->cardId = $savedCard["cid"];
             }
 
             // Create payment            
@@ -589,7 +623,7 @@ class SimplifyCommerceRequestBuilder
         }
         return $year;
     }
-    
+
 
     /* Returns data for Simplify Commerce CreatePayment and CreateAuthorization requests */
     public function getPaymentCreateRequest() {
