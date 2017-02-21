@@ -2,239 +2,7 @@
 
 namespace MasterCard\SimplifyCommerce\Model;
 
-require_once("Utilities.php");
-require_once("Simplify.php");
-
 use \Exception;
-use Simplify as SC;
-use Simplify_Payment as SC_Payment;
-use Simplify_Authorization as SC_Authorization;
-use Simplify_Refund as SC_Refund;
-use Simplify_Customer as SC_Customer;
-use Simplify_ObjectNotFoundException as SC_ObjectNotFoundException;
-
-
-/*
- * Request builder, for creating Simplify Commerce API requests 
-*/
-class SC_RequestBuilder
-{
-    public $order = null;
-    public $orderId = null;
-    public $billing = null;
-    public $shipping = null;
-    public $token = null;
-    public $cardNumber = null;
-    public $last4 = null;
-    public $cardType = null;
-    public $cardId = null;
-    public $customerId = null;
-    public $expirationYear = null;
-    public $expirationMonth = null;
-    public $cvc = null;
-    public $currency = null;
-    public $name = null;
-    public $email = null;
-    public $description = null;
-    public $reference = null;
-    public $amount = null;
-    public $parentTransactionId = null;
-    public $transactionId = null;
-    public $saveCard = false;
-    public $useSavedCard = false;
-
-    public function __construct(\Magento\Payment\Model\InfoInterface $payment, $amount = 0) {
-        if ($payment) {
-            $this->order = $payment->getOrder();      
-            $this->orderId = $this->order->getIncrementId();
-            $this->transactionId = $payment->getTransactionId();
-            $this->parentTransactionId = $payment->getParentTransactionId();
-            $this->billing = $this->order->getBillingAddress();
-            $this->shipping = $this->order->getShippingAddress();
-            $this->customerId = $this->order->getCustomerId();
-            $this->cardNumber = $payment->getCcNumber();
-            $this->cardType = $this->toSimplifyCardType($payment->getCcType());
-            $this->expirationYear = $this->toSimplifyYear($payment->getCcExpYear());
-            $this->expirationMonth = $payment->getCcExpMonth();
-            $this->cvc = $payment->getCcCid();
-            $this->currency = $this->order->getBaseCurrencyCode();
-            $this->name = $this->billing->getName();
-            $this->email = $this->order->getCustomerEmail();
-            $this->description = $this->email;
-            $this->reference = "#" . $this->orderId;
-            $this->cardToken = $payment->getAdditionalInformation("cc-token");
-            $this->last4 = $payment->getAdditionalInformation("cc-last4");
-            $this->saveCard = $payment->getAdditionalInformation("cc-save");
-            $this->useSavedCard = $payment->getAdditionalInformation("cc-use-card");
-        }
-        $this->amount = intval(round($amount * 100));
-    }
-
-
-    /* Converts Magento card type to Simplify card type */
-    public function toSimplifyCardType($cardType) {
-        $result = $cardType;
-        try {
-            $result = $this->cardTypes[$cardType];
-        }
-        catch (Exception $e) {
-        }
-        return $result;
-    }
-
-    /* Converts Magento expiration year to Simplify year */
-    public function toSimplifyYear($year) {
-        if ($year) {
-            $year = intval(substr(strval($year), -2));
-        }
-        return $year;
-    }
-
-    /* Returns data for Simplify Commerce CreatePayment and CreateAuthorization requests */
-    public function getPaymentCreateRequest() {
-        $data = null;
-        if ($this->amount && $this->currency) {
-            // capture pre-authorized payment
-            if ($this->parentTransactionId) {
-                $data = array(
-                    "amount" => $this->amount,
-                    "description" => $this->description,
-                    "authorization" => $this->parentTransactionId,
-                    "reference" => $this->reference,
-                    "currency" => $this->currency
-                );
-            }
-            // authorize/capture payment using Simplify customer identifier
-            else if ($this->cardId) {
-                $data = array(
-                    "amount" => $this->amount,
-                    "description" => $this->description,
-                    "customer" => $this->cardId,
-                    "reference" => $this->reference,
-                    "currency" => $this->currency
-                );
-            }
-            // authorize/capture payment using card token
-            else if ($this->cardToken) {
-                $data = array(
-                    "amount" => $this->amount,
-                    "description" => $this->description,
-                    "token" => $this->cardToken,
-                    "reference" => $this->reference,
-                    "currency" => $this->currency
-                );
-            }
-            // authorize/capture payment using raw card data
-            else if ($this->cardNumber) {
-                $data = array(
-                    "amount" => $this->amount,
-                    "description" => $this->description,
-                    "card" => array(
-                        "expYear" => $this->expirationYear,
-                        "expMonth" => $this->expirationMonth, 
-                        "cvc" => $this->cvc,
-                        "number" => $this->cardNumber
-                    ),
-                    "reference" => $this->reference,
-                    "currency" => $this->currency
-                );
-                if ($this->billing) {
-                    $data["card"]["name"] = $this->billing->getName();
-                    $data["card"]["addressCity"] = $this->billing->getCity();
-                    $data["card"]["addressLine1"] = $this->billing->getStreetLine(1);
-                    $data["card"]["addressLine2"] = $this->billing->getStreetLine(2);
-                    $data["card"]["addressZip"] = $this->billing->getPostcode();
-                    $data["card"]["addressState"] = $this->billing->getRegion();
-                    $data["card"]["addressCountry"] = $this->billing->getCountryId();
-                }
-            } 
-        }
-        return $data;
-    }
-
-
-    /** Returns data for Simplify Commerce CreateCustomer request */
-    public function getCustomerCreateRequest($customer) {
-        $data = null;
-        if ($customer) {
-            // create customer using token of a just-verified card
-            if ($this->cardToken) {
-                $data = array(
-                    "token" => $this->cardToken,
-                    "name" => $customer->getFirstName() . " " . $customer->getLastName(),
-                    "email" => $customer->getEmail(),
-                    "reference" => $customer->getId()
-                );
-            }
-            // create customer using raw card data
-            else if ($this->cardNumber) {
-                $data = array(
-                    "name" => $customer->getFirstName() . " " . $customer->getLastName(),
-                    "email" => $customer->getEmail(),
-                    "reference" => $customer->getId(),
-                    "card" => array(
-                        "expYear" => $this->expirationYear,
-                        "expMonth" => $this->expirationMonth, 
-                        "cvc" => $this->cvc,
-                        "number" => $this->cardNumber
-                    )
-                );
-                if ($this->billing) {
-                    $data["name"] = $this->billing->getName();
-                    $data["card"]["name"] = $this->billing->getName();
-                    $data["card"]["addressCity"] = $this->billing->getCity();
-                    $data["card"]["addressLine1"] = $this->billing->getStreetLine(1);
-                    $data["card"]["addressLine2"] = $this->billing->getStreetLine(2);
-                    $data["card"]["addressZip"] = $this->billing->getPostcode();
-                    $data["card"]["addressState"] = $this->billing->getRegion();
-                    $data["card"]["addressCountry"] = $this->billing->getCountryId();
-                }
-            } 
-        }
-        return $data;
-    }
-
-
-    /* Returns data for Simplify Commerce CreateRefund request */
-    public function getRefundCreateRequest($reason) {
-        $data = null;        
-        if ($this->amount && $this->currency && $this->transactionId) { 
-            $data = array(
-                "amount" => $this->amount,
-                "description" => is_null($reason) ? __("Refund for ") . $this->reference : $reason,
-                "payment" => $this->parentTransactionId,
-                "reference" => $this->reference
-            );
-        }
-        return $data;
-    }
-
-
-    /** Returns true if customer card can be saved:
-        - user requested that during checkout
-        - customer is logged in
-        - card data or card token is present */
-    public function canSaveCard() {
-        return $this->order &&
-               (!$this->order->getCustomerIsGuest()) &&
-               $this->saveCard &&
-               ($this->cardToken || $this.cardNumber) &&
-               $this->last4;
-    }
-
-
-    /** Card type map */
-    private $cardTypes = array(
-            "VI" => "VISA",
-            "MC" => "MASTERCARD",
-            "AE" => "AMEX",
-            "JCB" => "JCB",
-            "DI" => "DISCOVER",
-            "DN" => "DINERS"
-    );
-
-}
-
 
 /** 
  * Credit Card payments using Simplify Commerce API 
@@ -242,12 +10,7 @@ class SC_RequestBuilder
 class Payment extends \Magento\Payment\Model\Method\Cc
 {
     const CODE = 'simplifycommerce';
-    const RE_ANS = "/[^A-Z\d\-_',\.;:\s]*/i";
-    const RE_AN = "/[^A-Z\d]/i";
-    const RE_NUMBER = "/[^\d]/";
-
     protected $_code = self::CODE;
-    protected $version = "2.1.6";
 
     /** Feature availability */
     protected $_isGateway = false;
@@ -255,22 +18,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     protected $_canCapturePartial = true;
     protected $_canRefund = true;
     protected $_canRefundInvoicePartial = false;
-  
-    /** Payment method configuration */
-    protected $_minAmount = null;
-    protected $_maxAmount = null;
-    protected $_publicKey = null;
-    protected $_privateKey = null;
-    protected $_paymentAction = null;
-    protected $_savedCards = null;
 
-    protected $_developerMode = false;
-    protected $_storeManager = null;
-    protected $_customer = null;
-    protected $_customerExtensionFactory = null;
-    protected $_customerRepository = null;
-    protected $_configProvider = null;
-
+    protected $logger = null;
+    protected $gateway = null;
+    protected $developerMode = false;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -282,11 +33,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Payment\Model\Method\Logger $logger,
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
-        \Magento\Directory\Model\CountryFactory $countryFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository, 
-        \Magento\Customer\Api\Data\CustomerExtensionFactory $customerExtensionFactory,
+        \MasterCard\SimplifyCommerce\Model\PaymentGatewayFactory $gatewayFactory,
+        \Magento\Framework\App\State $appState,
         array $data = array()
     ) {
         parent::__construct(
@@ -304,216 +52,45 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $data
         );
 
-        $this->_logger = $logger;
-        $this->_storeManager = $storeManager;        
-        $this->_customerExtensionFactory = $customerExtensionFactory;
-        $this->_customerRepository = $customerRepository;
-        if ($currentCustomer->getCustomerId())       
-            $this->_customer = $customerRepository->getById($currentCustomer->getCustomerId());
-
-        $this->_developerMode = \MasterCard\SimplifyCommerce\Utilities::isDeveloperMode();
-
-        // Fetch Simplify Commerce plugin configuration
-        $this->_minAmount = $this->getConfigData('min_order_total');
-        $this->_maxAmount = $this->getConfigData('max_order_total');
-        $this->_publicKey = $this->getConfigData("public_key");
-        $this->_privateKey = $this->getConfigData("private_key");
-        $this->_paymentAction = $this->getConfigData("payment_action");        
-
-        // Configure Simplify Commerce API
-        SC::$publicKey = $this->_publicKey;
-        SC::$privateKey = $this->_privateKey;
-        SC::$userAgent = "Magento-" + $this->version;
-
-        // Fetch saved customer credit cards   
-        if ($this->_customer) {
-            $this->_savedCards = $this->getSavedCreditCards();
-        } 
-
-        $this->log("Payment module initialized");
-        // $this->validateSimplifyCommerceAccount();
+        $this->developerMode = $appState->getMode() == \Magento\Framework\App\State::MODE_DEVELOPER;
+        $this->logger = $logger;
+        $this->gateway = $gatewayFactory->create();
+        $this->log("Payment module initialized", $this->gateway->getVersion());
     }
 
 
     /** Outputs message and optional data to debug log */
     public function log($message, $data = null) {
-        $this->_logger->debug([
-            "message" => $message,
-            "data" => $data
-        ], null, $this->_developerMode);
+        $this->logger->debug(["message" => $message, "data" => $data], null, $this->developerMode);
     }
 
 
-    /** Returns true if saving customer cards is enabled in settings. 
-        The setting will only apply when hosted payments are used! */
-    public function canSaveCard() {
-        return (bool)$this->getConfigData("customer_save_credit_card") &&
-               (bool)$this->getConfigData("simplify_hostedpayments");
-    }
-
-
-    /** Retrieves stored credit cards associated with the current customer */
-    public function getSavedCreditCards() {
-        $savedCreditCards = [];
-        if ($this->_customer && $this->_customer->getEmail() && $this->canSaveCard()) {
-            $customers = SC_Customer::listCustomer([
-                "filter" => [
-                    "text"=> $this->_customer->getEmail()
-                ]
-            ]);
-            if ($customers) {
-                foreach ($customers->list as $customer) {
-                    if ($customer->card) {
-                        $card = [
-                            "id" => $customer->id,
-                            "last4" => $customer->card->last4,
-                            "year" => $customer->card->expYear,
-                            "month" => $customer->card->expMonth,
-                        ];
-                        if (!isset($savedCreditCards[$card["last4"]]))
-                            $savedCreditCards[$card["last4"]] = $card;
-                    }
-                }
+    /** Handles error result of payment gateway transaction */
+    public function handleError($operation, $result) {
+        if ($operation && $result && $result["error"]) {
+            $message = $operation . ": " . $result["status"];
+            if ($result["details"]) {
+                $message = $message . ", " . $result["details"];
             }
+            $this->log($message);
+            throw new \Magento\Framework\Exception\LocalizedException(__($operation . " failed"));
         }
-        return $savedCreditCards;
     }
-
-
-    /** Finds a saved credit card with the specified last four digits */
-    public function findCreditCard($last4) {
-        $savedCreditCard = null;
-        if ($this->_savedCards) {
-            foreach ($this->_savedCards as $card) {            
-                if ($card["last4"] == $last4) {
-                    $savedCreditCard = $card;
-                    break;
-                }
-            }
-        }
-        return $savedCreditCard;
-    }
-
-
-    /** Saves credit card in Simplify Commerce */
-    public function saveCreditCard($payment) {
-        $savedCreditCard = null;
-        $requestBuilder = new SC_RequestBuilder($payment);
-
-        // Proceed if saving cards enabled in store configuration, customer is logged in 
-        // and all data required for saving the card available in the payment
-        if ($this->_customer && $requestBuilder->canSaveCard() && $this->canSaveCard()) {
-            // ... but ignore if the specified card has already been saved
-            if ($this->_savedCards && isset($this->_savedCards[$requestBuilder->last4])) {
-                $savedCreditCard = $this->_savedCards[$requestBuilder->last4];
-            }
-            else {
-                $result = null;
-                $request = $requestBuilder->getCustomerCreateRequest($this->_customer);
-                if ($request) {
-                    $this->log("Customer request", $request);
-                    $result = SC_Customer::createCustomer($request);
-                }
-                if ($result && $result->id) {
-                    $savedCreditCard = [
-                        "id" => $result->id,
-                        "last4" => $result->card->last4,
-                        "year" => $result->card->expYear,
-                        "month" => $result->card->expMonth,
-                    ];
-                    // store in saved cards cache
-                    $this->_savedCards[$savedCreditCard["last4"]] = $savedCreditCard;
-                }
-            }
-        }
-        
-        return $savedCreditCard;
-    }
-    
-    /** 
-     * Performs a test call to Simplify Commerce API to validate the keys 
-     */     
-    public function validateSimplifyCommerceAccount() {
-        $result = true;
-        try {
-            $cid = "-invalid-customer-";
-            $c = SC_Customer::findCustomer($cid);
-        } 
-        catch (SC_ObjectNotFoundException $e) {
-        }
-        catch (Exception $e) {
-            $result = false;
-        }
-        if ($result) {
-            $this->log("Merchant account valid", [ "publicKey" => $this->_publicKey]);
-        } else {
-            $this->log("Cannot validate merchant account", [ "publicKey" => $this->_publicKey]);
-        }
-        return $result;
-    }
-
 
     /** 
      * Authorize payment 
      * Payment interface: /vendor/magento/module-sales/Model/Order/Payment.php
      */
-    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount)
-    {
-        $this->log("Authorizing payment ...");
-
-        $result = null;
-        try {
-            $requestBuilder = new SC_RequestBuilder($payment, $amount);            
-
-            // Use saved card if selected
-            if ($requestBuilder->useSavedCard) {
-                $savedCard = $this->findCreditCard($requestBuilder->useSavedCard);
-                if ($savedCard) {
-                    $requestBuilder->cardId = $savedCard["id"];
-                }
-            }
-            else {
-                // Save card if required
-                if ($requestBuilder->canSaveCard()) {
-                    $savedCard = $this->saveCreditCard($payment);
-                    if ($savedCard) {
-                        // Pass card identifier to request builder, so that the payment is performed with it.
-                        // Card token has already been used for saving the card, so payment with it would fail.
-                        $requestBuilder->cardId = $savedCard["id"];
-                    }
-                }
-            }
-
-            // Authorize payment
-            $request = $requestBuilder->getPaymentCreateRequest();
-            if ($request) {
-                $this->log("Authorization request", $request);
-                $result = SC_Authorization::createAuthorization($request);
-            }
+    public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+        $result = $this->gateway->authorize($payment, $amount);
+        if ($result["error"]) {
+            $this->handleError("Authorization", $result);
+        } 
+        else {
+            $payment->setTransactionId($result["transactionId"]);
+            $payment->setCcLast4($result["last4"]);
+            $payment->setIsTransactionClosed(false);
         }
-        catch (Exception $e) {
-            $status = $e->getMessage();
-            $this->log("Authorization failed", $status);
-            throw new \Magento\Framework\Exception\LocalizedException(__("Authorization failes: " . $status));
-        }
-
-        if ($result) {
-            if ($result->paymentStatus == "APPROVED") {
-                $this->log("Authorization approved", $result->id);
-                $payment->setTransactionId($result->id);
-                // $payment->setParentTransactionId($result->id);
-                $payment->setCcLast4($result->card->last4);
-                $payment->setIsTransactionClosed(false);
-            } else {
-                $this->log("Authorization not approved", $result->paymentStatus);
-                throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not approved: " . $result->paymentStatus . $result->declineReason));
-            }
-        }
-        else {            
-            $this->log("Authorization not processed");
-            throw new \Magento\Framework\Exception\LocalizedException(__("Authorization not processed"));
-        }
-
         return $this;
     }
 
@@ -527,69 +104,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc
     }
 
     public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        $this->log("Capturing payment ...");
-
-        $result = null;
-        $requestBuilder = null;
-        $parentTransactionId = null;
-        try {
-            $requestBuilder = new SC_RequestBuilder($payment, $amount);
-
-            // Use saved card if selected
-            if ($requestBuilder->useSavedCard) {
-                $savedCard = $this->findCreditCard($requestBuilder->useSavedCard);
-                if ($savedCard) {
-                    $requestBuilder->cardId = $savedCard["id"];
-                }
-            }
-            else {
-                // Save card if required
-                if ($requestBuilder->canSaveCard()) {
-                    $savedCard = $this->saveCreditCard($payment);
-                    if ($savedCard) {
-                        // Pass card identifier to request builder, so that the payment is performed with it.
-                        // Card token has already been used for saving the card, so payment with it would fail.
-                        $requestBuilder->cardId = $savedCard["id"];
-                    }
-                }
-            }
-
-            // Create payment            
-            $request = $requestBuilder->getPaymentCreateRequest();
-            if ($request) {
-                $parentTransactionId = $requestBuilder->parentTransactionId;
-                $this->log("Payment request", $request);
-                $result = SC_Payment::createPayment($request);
-            }
+        $result = $this->gateway->capture($payment, $amount);
+        if ($result["error"]) {
+            $this->handleError("Payment", $result);
+        } 
+        else {
+            $payment->setTransactionId($result["transactionId"]);
+            $payment->setParentTransactionId($result["parentTransactionId"]);
+            $payment->setCcLast4($result["last4"]);
+            $payment->setIsTransactionClosed(true);
+            $payment->setShouldCloseParentTransaction(true);               
         }
-        catch (Exception $e) {
-            $status = $e->getMessage();
-            $this->log("Payment failed", $status);
-            throw new \Magento\Framework\Exception\LocalizedException(__("Payment failed: " . $status));
-        }
-
-        if ($result) {
-            if ($result->paymentStatus == "APPROVED") {
-                $this->log("Payment approved", $result->id);
-                $payment->setTransactionId($result->id);
-                if ($parentTransactionId) {
-                    $payment->setParentTransactionId($parentTransactionId);
-                } else {
-                    $payment->setParentTransactionId($result->id);
-                }
-                $payment->setCcLast4($result->card->last4);
-                $payment->setIsTransactionClosed(true);
-                //$payment->setShouldCloseParentTransaction(true);               
-            } else {
-                $this->log("Payment not approved", $result->paymentStatus);
-                throw new \Magento\Framework\Exception\LocalizedException(__("Payment not approved: " . $result->paymentStatus . $result->declineReason));
-            }
-        }
-        else {            
-            $this->log("Payment not executed");
-            throw new \Magento\Framework\Exception\LocalizedException(__("Payment not executed"));
-        }
-
         return $this;
     }
 
@@ -599,87 +124,38 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      */
     public function void(\Magento\Payment\Model\InfoInterface $payment)
     {
-        $this->log("Voiding payment ...");
-
-        $result = false;
-        try {
-            $requestBuilder = new SC_RequestBuilder($payment, $amount);
-            if ($request) {
-                $authorization = SC_Authorization::findAuthorization($requestBuilder->transactionId);
-                if ($authorization) {
-                    $result = SC_Authorization::deleteAuthorization($authorization);
-                }
-            }
-        }
-        catch (Exception $e) { 
-            $status = $e->getMessage();
-            $this->log("Void failed", $status);
-            throw new \Magento\Framework\Exception\LocalizedException(__("Void failed: " . $refundStatus));
-        }
-
-        if ($result) {
+        $result = $this->gateway->void($payment);
+        if ($result["error"]) {
+            $this->handleError("Void", $result);
+        } 
+        else {
             $payment->setIsTransactionClosed(true);
             $payment->setShouldCloseParentTransaction(true);
-            $this->log("Void approved");
         }
-        else {            
-            $this->log("Void not executed");
-            throw new \Magento\Framework\Exception\LocalizedException(__("Void not executed"));
-        }
-
         return $this;
     }
 
     public function cancel(\Magento\Payment\Model\InfoInterface $payment)
     {
-        $this->void($payment);
-        return $this;
+        return $this->void($payment);
     }
 
 
     /** 
      * Refund the payment 
      */
-    public function canRefund()
-    {
-        return $this->_canRefund;
-    }
-
-
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-        $this->log("Refunding payment ...");
-
-        $result = null;
-        $status = __("Refund not approved");
-        $parentTransactionId = null;
-        try {
-            $requestBuilder = new SC_RequestBuilder($payment, $amount);
-            $request = $requestBuilder->getRefundCreateRequest(null);
-            if ($request) {
-                $this->log("Refund request", $request);
-                $parentTransactionId = $requestBuilder->parentTransactionId;
-                $result = SC_Refund::createRefund($request);
-            }
-        }
-        catch (Exception $e) { 
-            $status = $e->getMessage();
-            $this->log("Refund failed", $refundStatus);
-            throw new \Magento\Framework\Exception\LocalizedException(__("Refund failed: " . $status));
-        }
-
-        if ($result) {
+        $result = $this->gateway->refund($payment, $amount);
+        if ($result["error"]) {
+            $this->handleError("Refund", $result);
+        } 
+        else {
             $payment
-                ->setTransactionId($result->id)
-                ->setParentTransactionId($parentTransactionId)
+                ->setTransactionId($result["transactionId"])
+                ->setParentTransactionId($result["parentTransactionId"])
                 ->setIsTransactionClosed(true)
                 ->setShouldCloseParentTransaction(true);
-            $this->log("Refund approved", $result->id);
         }
-        else {            
-            $this->log("Refund not executed");
-            throw new \Magento\Framework\Exception\LocalizedException(__("Refund not executed"));
-        }
-
         return $this;
     }
 
@@ -688,20 +164,23 @@ class Payment extends \Magento\Payment\Model\Method\Cc
      * Determine method availability based on quote amount and config data 
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null) {
-        // Simplify Commerce API keys required
-        if (!$this->_publicKey) {
-            $this->log("Payment method not available: public API key not specified");
+        // Simplify Commerce Gateway is not available?
+        if (!$this->gateway) {
+            $this->log("Simplify Commerce Payments Gateway not available");
             return false;
         }
-        if (!$this->_privateKey) {
-            $this->log("Payment method not available: private API key not specified");
+
+        // Simplify Commerce Gateway is not configured properly?
+        $configurationErrors = $this->gateway->validate();
+        if ($configurationErrors) {
+            $this->log($configurationErrors);
             return false;
         }
 
         // Order total must be within the specified limits
         if ($quote) {
             $total = $quote->getBaseGrandTotal();
-            if ($total < $this->_minAmount || ($this->_maxAmount && $total > $this->_maxAmount)) {
+            if (!$this->gateway->isOrderAmountValid($total)) {
                 $this->log("Payment method not available: order value out of range");
                 return false;
             }
@@ -721,6 +200,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             return false;
         }
 
+        // Order currency must be allowed
         if ($quote) {
             $currencyCode = $quote->getBaseCurrencyCode();
             if (!$this->isCurrencySupported($currencyCode)) {

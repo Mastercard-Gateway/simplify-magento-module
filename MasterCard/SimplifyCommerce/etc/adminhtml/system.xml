@@ -63,6 +63,8 @@
                         <field id="allowspecific">1</field>
                     </depends>
                 </field>
+                <field id="debugReplaceKeys" showInDefault="0" showInStore="0" showInWebsite="0" type="text">
+                </field>
             </group>
         </section>
     </system>

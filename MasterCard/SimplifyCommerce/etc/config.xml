@@ -18,6 +18,7 @@
                 <simplify_hostedpayments>1</simplify_hostedpayments>
                 <min_order_total>0.50</min_order_total>
                 <customer_save_credit_card>0</customer_save_credit_card>
+                <debugReplaceKeys>private_key,cc_number,cc_cid,cc_expiration_year,cc_expiration_month,expYear,expMonth,number,cvc,year,month</debugReplaceKeys>
             </simplifycommerce>
         </payment>
     </default>

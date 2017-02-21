@@ -391,7 +391,7 @@ define(
                         var total = quote.totals();
                         var billingAddress = quote.billingAddress() || {};
                         payment = {
-                            scKey: clean(configuration.publicAPIKey),
+                            scKey: clean(configuration.publicKey),
                             color: "#1979C3",
                             name: clean(configuration.storeName, "Magento Store"),
                             receipt: true,
