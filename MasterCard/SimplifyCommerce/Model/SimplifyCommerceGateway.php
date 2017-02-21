@@ -84,19 +84,24 @@ class SimplifyCommerceGateway extends \Magento\Framework\Model\AbstractExtensibl
     /** Recursively obfuscated confidential values in the specified data object */
     private function obfuscate($data) {
         if ($data) {
-            $data = unserialize(serialize($data));
-            if (is_array($data) || is_object($data)) {
-                foreach ($data as $key => $value) {
-                    if ($key != "0" && in_array($key, $this->confidentialValues)) {
-                        $data[$key] = "****";
-                    }
-                    else {
-                        if (is_array($value) || is_object($value)) {
-                            $data[$key] = $this->obfuscate($data[$key]);
+            try {
+                $data = unserialize(serialize($data));
+                if (is_array($data) || is_object($data)) {
+                    foreach ($data as $key => $value) {
+                        if ($key != "0" && in_array($key, $this->confidentialValues)) {
+                            $data[$key] = "****";
+                        }
+                        else {
+                            if (is_array($value) || is_object($value)) {
+                                $data[$key] = $this->obfuscate($data[$key]);
+                            }
                         }
                     }
-                }
-            } 
+                } 
+            }
+            catch (Exception $error) {
+                $data = null;
+            }
         }
         return $data;
     }
