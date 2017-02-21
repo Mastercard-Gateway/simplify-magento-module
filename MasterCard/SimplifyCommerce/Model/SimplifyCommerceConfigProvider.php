@@ -11,7 +11,6 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
 {
     protected $gateway = null;
 
-
     public function __construct(
         \MasterCard\SimplifyCommerce\Model\PaymentGatewayFactory $gatewayFactory
     ) {
@@ -21,15 +20,15 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
 
     public function getConfig()
     {
-        $configuration = $this->gateway->getConfiguration();
-        // get rid of some of fields in saved credit cards 
-        /*
-        if ($configuration["customer"]["cards"]) {
-                //"year"
-                //"month"
-                //"id"
+        // get rid of some confidential fields in saved credit cards 
+        $configuration = unserialize(serialize($this->gateway->getConfiguration()));
+        foreach ($configuration["customer"]["cards"] as $last4 => $card) {
+            unset($card["year"]);
+            unset($card["month"]);
+            unset($card["cid"]);
+            $configuration["customer"]["cards"][$last4] = $card;
         }
-        */
+
         return [
             "payment" => [
                 "simplifycommerce" => $configuration
