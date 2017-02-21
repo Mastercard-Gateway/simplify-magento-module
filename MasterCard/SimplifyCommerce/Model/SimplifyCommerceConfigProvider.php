@@ -20,8 +20,9 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
 
     public function getConfig()
     {
-        // get rid of some confidential fields in saved credit cards 
+        // get rid of confidential fields 
         $configuration = unserialize(serialize($this->gateway->getConfiguration()));
+        unset($configuration["privateKey"]);
         foreach ($configuration["customer"]["cards"] as $last4 => $card) {
             unset($card["year"]);
             unset($card["month"]);
