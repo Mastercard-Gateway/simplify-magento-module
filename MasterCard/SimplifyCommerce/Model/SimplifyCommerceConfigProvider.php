@@ -23,11 +23,13 @@ class SimplifyCommerceConfigProvider implements ConfigProviderInterface
         // get rid of confidential fields 
         $configuration = unserialize(serialize($this->gateway->getConfiguration()));
         unset($configuration["privateKey"]);
-        foreach ($configuration["customer"]["cards"] as $last4 => $card) {
-            unset($card["year"]);
-            unset($card["month"]);
-            unset($card["cid"]);
-            $configuration["customer"]["cards"][$last4] = $card;
+        if ($configuration["customer"] && $configuration["customer"]["cards"]) {
+            foreach ($configuration["customer"]["cards"] as $last4 => $card) {
+                unset($card["year"]);
+                unset($card["month"]);
+                unset($card["cid"]);
+                $configuration["customer"]["cards"][$last4] = $card;
+            }
         }
 
         return [
