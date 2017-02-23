@@ -9,7 +9,7 @@
             "email": "tomasz.waraksa@mastercard.com"
         }
     ],
-    "minimum-stability": "alpha",
+    "minimum-stability": "dev",
     "require": {
         "php": "~5.6.0|7.0.2|~7.0.6",
         "magento/magento-composer-installer": "*"
