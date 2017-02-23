@@ -3,7 +3,7 @@
     <default>
         <payment>
             <simplifycommerce>
-                <debug>1</debug>
+                <debug>0</debug>
                 <active>1</active>
                 <model>MasterCard\SimplifyCommerce\Model\Payment</model>
                 <payment_action>authorize_capture</payment_action>
