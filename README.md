@@ -10,6 +10,9 @@ The module allows payments using Simplify Commerce Hosted Payments. Simplify Com
 ### Magento 2.1
 The module requires Magento 2.1 or newer. It supports both Community Edition and Enterprise Edition. 
 
+### Magento 2.1
+Customer account at Magento Marketplace website at [https://marketplace.magento.com](https://marketplace.magento.com) and access keys. Once you register and log in, navigate to *My Access Keys* and create a new pair of access keys on Magento 2 tab. Note both the public and the private key, you will need them later during installation of the module. 
+
 ### Composer
 To download and install the components you need Composer, a PHP package manager. If it's not yet there on your Magento 2 server, install it first. Please follow the instructions specific for your operating system: [https://getcomposer.org/doc/00-intro.md](https://getcomposer.org/doc/00-intro.md)
 
@@ -39,6 +42,8 @@ Run the following commands to download and install the module:
     composer require mastercard/module-simplifycommerce:2.1.6 --prefer-dist
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
+
+When asked by Composer for user name and password for Magento repository at [https://repo.magento.com](https://repo.magento.com), enter the Magento Marketplace public key as user name, and private key as password.
 
 Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
 
