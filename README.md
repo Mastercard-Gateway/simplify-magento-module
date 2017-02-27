@@ -27,15 +27,13 @@ The preferred method to install the module is by using PHP Composer:
 
 1. Log on to your Magento 2 server and navigate to Magento installation folder. The exact location can vary, but you can identify it by content. Inside this folder, amongst others, you should see the following files and folders: 
 
-`    index.php`
 
-`    composer.json`
 
-`    /bin`
-
-`    /var`
-
-`    /vendor`
+    index.php
+    composer.json
+    /bin
+    /var
+    /vendor
 
 2. Run the following commands to download and install the module:
 
