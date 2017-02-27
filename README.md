@@ -29,7 +29,7 @@ The preferred method to install the module is by using PHP Composer:
 
     index.php
     composer.json
-    /bin
+    /bin 
     /var
     /vendor
 
@@ -63,7 +63,7 @@ If you prefer to deploy and install the module without Composer, proceed with th
 If you want to uninstall the previously installed Simplify Commerce Payment Gateway module, please run the following commands:
 
     ./bin/magento module:uninstall MasterCard_SimplifyCommerce
-    ./bin/magento setup:upgrade
+    ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 
 
