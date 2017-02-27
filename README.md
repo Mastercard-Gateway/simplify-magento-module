@@ -25,42 +25,38 @@ Before installing the module, make a full backup of your site.
 ### Installation using PHP Composer
 The preferred method to install the module is by using PHP Composer:
 
-1. Log on to your Magento 2 server and navigate to Magento installation folder. The exact location can vary, but you can identify it by content. Inside this folder, amongst others, you should see the following files and folders: 
+Log on to your Magento 2 server and navigate to Magento installation folder. The exact location can vary, but you can identify it by content. Inside this folder, amongst others, you should see the following files and folders: 
 
-<pre><code>
     index.php
     composer.json
     /bin
     /var
     /vendor
-</code></pre>
-2. Run the following commands to download and install the module:
 
+Run the following commands to download and install the module:
 
     composer config repositories.mastercard-module-simplifycommerce git https://github.com/simplifycom/simplify-magento-module.git
     composer require mastercard/module-simplifycommerce:2.1.6 --prefer-dist
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 
-3. Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
+Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
 
 ### Manual installation 
 If you prefer to deploy and install the module without Composer, proceed with the following steps:
 
-1. Download module files from [https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip](https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip)
-2. Create folder structure inside the the Magento main folder:
+Download module files from [https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip](https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip)
 
+Create folder structure inside the the Magento main folder:
 
     ./vendor/mastercard/module-simplifycommerce 
 
-3. Extract module files into that folder
-4. Execute the following commands:
-
+Extract module files into that folder and execute the following commands:
 
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
     
-3. Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
+Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
 
 
 ### Deinstallation
