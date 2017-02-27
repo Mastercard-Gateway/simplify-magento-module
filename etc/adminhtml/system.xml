@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="simplifycommerce" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="text">
+            <group id="simplifycommerce" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="text">
                 <label>Simplify Commerce by MasterCard</label>
                 <field id="active" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select">
                     <label>Enabled</label>
@@ -35,7 +35,7 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Credit card input form from Simplify Commerce will be used, for better security and PCI compliance</comment>
                 </field>
-                <field id="customer_save_credit_card" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="120" translate="label" type="select">
+                <field id="customer_save_credit_card" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="95" translate="label" type="select">
                     <label>Customer can save credit card</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Allow customers credit card tokens to be saved for future use.</comment>

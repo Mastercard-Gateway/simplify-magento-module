@@ -1,54 +1,66 @@
-Simplify Commerce Magento 2 Module
-==================================
+# Simplify Commerce Payment Gateway for Magento 2
 
-Overview
---------
-```
-WARNING! WORK IN PROGRESS!
-```
+## Overview
+Simplify Commerce Payment Gateway module is a free Magento 2 module that adds Simplify Commerce as payment method on your Magento 2 checkout page. With simple configuration steps described below you can quickly start using Simplify Commerce's secure payment form for receiving payments in your online store. 
 
-
-Installation
-------------
-
-Installation using Composer
----------------------------
-
-1.	Under the Magento root folder run the following command to setup the repository:
-```
-composer config repositories.simplifycommerce git https://github.com/ nnnnn .git
-```
-2.	Then run the following command to add the module:
-```
-composer require mastercard/module-simplifycommerce
-```
-3.	Following this the dependencies will be fetched or updated where required – this may take a few minutes.
-4.	Once all dependencies have installed the module needs to be enabled using the following commands:
-```
-php bin/magento module:enable MasterCard_SimplifyCommerce --clear-static-content && php bin/magento setup:upgrade
-```
-5.	Once the setup:upgrade command completes the module will be available within the Store Admin to configure.
+The module allows payments using Simplify Commerce Hosted Payments. Simplify Commerce Hosted Payments handle credit card data in safe and secure way, with full compliance with legal requirements. We use state-of-the-art encryption and tokenization to securely get payment information from your customer to our database. We monitor every transaction and manage sensitive payment data on our Level 1 PCI certified servers, which makes PCI compliance easier for you. Optionally, you can still use Magento's own credit card input form, if you prefer that, while payments will still be executed by Simplify Commerce API.
 
 
-Manual Installation
--------------------
+## Prerequisites
+The module requires Magento 2.1 or newer. It supports both Community Edition and Enterprise Edition. 
 
-1.	Download the latest archive of the module from https://github.com/ nnnnn .zip
-2.	Copy the archive to the server and extract – the files should be extracted into the Magento /app/code folder.
-3.	Run enable the module by running the following commands:
-```
-php bin/magento module:enable MasterCard_SimplifyCommerce --clear-static-content && php bin/magento setup:upgrade
-```
-4.	Once the setup:upgrade command completed the module will be available within the Store Admin to configure
+Before you can use it, you must first create a Simplify Commerce account at [https://www.simplify.com/commerce/](https://www.simplify.com/commerce/)
+
+We recommend that you configure the module using Simplify Commerce Sandbox configuration. This way you can make sure everything works well, before you start receiving live payments. For testing module configuration you can use test card numbers provided by Simplify Commerce at [https://simplify.com/commerce/docs/testing/test-card-numbers](https://simplify.com/commerce/docs/testing/test-card-numbers). You will find more details about the configuration in the following chapters.     
 
 
-Configuration
--------------
-To configure the module the following steps should be taken:
+## Installation
+Before installing the module, make a full backup of your site.
 
-1.	Login to the Magento Admin area 
-2.	From the menu on the left hand side select Stores and then Configuration
-3.  Under the Configuration menu select Sales and then Payment Methods
-4.	Under the Simplify Commerce payment method set the configuration details as required
-5.	Once the configuration has been entered click Save Config – this will commit the changes to the database. The payment method can now be tested.
+Log on to your Magento 2 server and navigate to Magento installation folder. Run the following commands to download and install the module:
+
+    composer config repositories.mastercard-module-simplifycommerce git https://github.com/simplifycom/simplify-magento-module.git
+    composer require mastercard/module-simplifycommerce:2.1.6 --prefer-dist
+    ./bin/magento setup:upgrade
+    ./bin/magento cache:clean
+
+Once the commands have been executed, you should verify that the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
+
+If you want to uninstall the previously installed Simplify Commerce Payment Gateway module, please run the following commands:
+
+    ./bin/magento module:uninstall MasterCard_SimplifyCommerce
+    ./bin/magento setup:upgrade
+    ./bin/magento cache:clean
+
+
+## Configuration
+
+### Configuration steps
+Please follow these steps to configure the module:
+
+1. Login to Magento Admin dashboard 
+2. Go to *Stores* > *Configuration* > *Sales* > *Payment Methods*
+3. Expand *OTHER PAYMENT METHODS*, then *Simplify Commerce by MasterCard*
+4. Fill in configuration details as described below
+5. Click Save Config to store the configuration.
+6. Follow Magento instructions and clean application cache, to make sure that the new payment method is immediately available in your online store.  
+
+### Configuration details
+The following settings are available in Simplify Commerce Payment Gateway configuration screen:
+
+* *Enabled*: should be set to YES, to make Simplify Commerce available as payment method on checkout page
+* *Title*: name of the payment method displayed on checkout page
+* *Public API Key": secret key from your Simplify Commerce Merchant Dashboard. For testing the module please use the Sandbox key. Once you see that payments from Magento 2 with test credit card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment you will be able to receive payments from real credit cards.
+* *Private API Key": the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
+* *Display Order*: position, at which this payment method should be listed on checkout page
+* *New Order Status*: status assigned to a newly created order, before the payment has been received
+* *Payment Action*: determines when the buyer's credit card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.
+* *Use Simplify Hosted Payments*: if YES, hosted payment form from Simplify Commerce is used to enter the credit card data. In this scenario no credit card data is ever processed or stored in your Magento 2 system. This is the most secure and recommended solution.
+* *Customer can save credit card*: if YES, the customer can store credit cards in Simplify Commerce for future use. This option is only available, when Simplify Hosted Payments are enabled. 
+* *Credit Card Types*: card types that should be accepted in your online store   
+* *Accepted Currencies*: currencies accepted in your online store
+* *Payment from Applicable Countries*: countries from which customers are allowed in your online store
 
+
+## License
+This software is Open Source, released under the BSD 3-Clause license. See [LICENSE.md](LICENSE.md) for more info.
