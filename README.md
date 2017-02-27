@@ -25,12 +25,21 @@ Before installing the module, make a full backup of your site.
 ### Installation using PHP Composer
 The preferred method to install the module is by using PHP Composer:
 
-1. Log on to your Magento 2 server and navigate to Magento installation folder
+1. Log on to your Magento 2 server and navigate to Magento installation folder. The exact location can vary, but you can identify it by content. Inside this folder, amongst others, you should see the following files and folders: 
+
+    index.php
+    composer.json
+    /bin
+    /var
+    /vendor
+
 2. Run the following commands to download and install the module:
+
     composer config repositories.mastercard-module-simplifycommerce git https://github.com/simplifycom/simplify-magento-module.git
     composer require mastercard/module-simplifycommerce:2.1.6 --prefer-dist
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
+
 3. Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
 
 ### Manual installation 
@@ -38,11 +47,15 @@ If you prefer to deploy and install the module without Composer, proceed with th
 
 1. Download module files from [https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip](https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip)
 2. Create folder structure inside the the Magento main folder:
+
     ./vendor/mastercard/module-simplifycommerce 
+
 3. Extract module files into that folder
 4. Execute the following commands:
+
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
+    
 3. Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
 
 
@@ -71,8 +84,8 @@ The following settings are available in Simplify Commerce Payment Gateway config
 
 * *Enabled*: should be set to YES, to make Simplify Commerce available as payment method on checkout page
 * *Title*: name of the payment method displayed on checkout page
-* *Public API Key": secret key from your Simplify Commerce Merchant Dashboard. For testing the module please use the Sandbox key. Once you see that payments from Magento 2 with test credit card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment you will be able to receive payments from real credit cards.
-* *Private API Key": the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
+* *Public API Key*: secret key from your Simplify Commerce Merchant Dashboard. For testing the module please use the Sandbox key. Once you see that payments from Magento 2 with test credit card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment you will be able to receive payments from real credit cards.
+* *Private API Key*: the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
 * *Display Order*: position, at which this payment method should be listed on checkout page
 * *New Order Status*: status assigned to a newly created order, before the payment has been received
 * *Payment Action*: determines when the buyer's credit card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.
