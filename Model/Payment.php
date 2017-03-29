@@ -34,7 +34,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc
         \Magento\Framework\Module\ModuleListInterface $moduleList,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
         \MasterCard\SimplifyCommerce\Model\PaymentGatewayFactory $gatewayFactory,
-        \Magento\Framework\App\State $appState,
         array $data = array()
     ) {
         parent::__construct(
@@ -48,11 +47,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc
             $moduleList,
             $localeDate,
             null,
-            null,
             $data
         );
 
-        $this->developerMode = $appState->getMode() == \Magento\Framework\App\State::MODE_DEVELOPER;
+        $this->developerMode = $this->_appState->getMode() == \Magento\Framework\App\State::MODE_DEVELOPER;
         $this->logger = $logger;
         $this->gateway = $gatewayFactory->create();
         $this->log("Payment module initialized", $this->gateway->getVersion());
