@@ -17,7 +17,7 @@ Customer account at Magento Marketplace website at [https://marketplace.magento.
 To download and install the components you need Composer, a PHP package manager. If it's not yet there on your Magento 2 server, install it first. Please follow the instructions specific for your operating system: [https://getcomposer.org/doc/00-intro.md](https://getcomposer.org/doc/00-intro.md)
 
 ### Simplify Commerce Account
-Before you can use the module, you must first create a Simplify Commerce account at [https://www.simplify.com/commerce/](https://www.simplify.com/commerce/)
+Before you can use the module, you must have a Simplify Commerce account [https://www.simplify.com/commerce/](https://www.simplify.com/commerce/)
 
 We recommend that you configure the module using Simplify Commerce Sandbox configuration. This way you can make sure everything works well, before you start receiving live payments. For testing module configuration you can use test card numbers provided by Simplify Commerce at [https://simplify.com/commerce/docs/testing/test-card-numbers](https://simplify.com/commerce/docs/testing/test-card-numbers). You will find more details about the configuration in the following chapters.     
 
