@@ -405,7 +405,7 @@ define(
                                             clean(configuration.customer.email) : 
                                             clean(quote.guestEmail),
                             reference: "#" + clean(quote.getQuoteId()),
-                            amount: clean(total.grand_total * 100, 0),
+                            amount: clean((total.grand_total + total.tax_amount) * 100, 0),
                             currency: clean(total.base_currency_code),
                             address: clean(concatenate(billingAddress.street)),
                             addressCity: clean(billingAddress.city),
