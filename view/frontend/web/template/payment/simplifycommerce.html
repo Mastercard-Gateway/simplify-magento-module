@@ -1,134 +1,68 @@
-
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
-    <!-- Radiobutton for selecting this payment method -->
     <div class="payment-method-title field choice">
         <input type="radio"
                name="payment[method]"
                class="radio"
-               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
-        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
+        <label class="label" data-bind="attr: {'for': getCode()}">
+            <span data-bind="text: getTitle()"></span>
+        </label>
     </div>
-
     <div class="payment-method-content">
-        <!-- Billing addres is disabled if Simplify Hosted Payments used, 
-             as it has its own Billing Address editor -->
-        <!-- ko ifnot: configuration.hostedPaymentsEnabled --> 
-            <!-- Billing address -->
-            <!-- ko foreach: getRegion('messages') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <fieldset class="fieldset" data-bind='attr: {id: "payment_form_" + getCode()}'>
             <div class="payment-method-billing-address">
                 <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
                 <!-- ko template: getTemplate() --><!-- /ko -->
                 <!--/ko-->
             </div>
-        <!--/ko-->
-
-        <!-- Saved credit cards -->
-        <!-- ko if: savedCards.available -->
-            <div class="simplifycommerce-cards-title">
-                Select one of your credit cards:
-            </div>
-            <!-- ko foreach: savedCards.items -->            
-            <div class="simplifycommerce-card field choice">
-                <input type="radio" name="simplifycommerce-card" class="radio"
-                    data-bind="attr: {
-                        id: $parent.savedCards.getCardId(last4), 
-                        value: last4
-                    },
-                    click: $parent.savedCards.cardSelected,
-                    checked: $parent.savedCards.selectedCard"/>
-                <label data-bind="attr: {'for': $parent.savedCards.getCardId(last4) }" class="label">
-                    <span data-bind="text: $parent.savedCards.getCardTitle(type, last4)"></span>
+            <!-- ko if: (isVaultEnabled())-->
+            <div class="field choice">
+                <input type="checkbox"
+                       name="vault[is_enabled]"
+                       class="checkbox"
+                       data-bind="attr: {'id': getCode() + '_enable_vault'}, checked: vaultEnabler.isActivePaymentTokenEnabler"/>
+                <label class="label" data-bind="attr: {'for': getCode() + '_enable_vault'}">
+                    <span><!-- ko i18n: 'Save for later use.'--><!-- /ko --></span>
                 </label>
-            </div>
-            <!--/ko-->
-            <!-- ko if: savedCards.selectedCard -->
-            <div class="simplifycommerce-card simplifycommerce-card-other field choice" 
-                data-bind="visible: savedCards.selectedCard() != 'other'">
-                <input type="radio" name="simplifycommerce-card" class="radio" 
-                    data-bind="attr: {
-                        id: savedCards.getCardId('other'), 
-                        value: 'other'                        
-                    },
-                    click: savedCards.cardSelected,
-                    checked: savedCards.selectedCard"/>
-                <label data-bind="attr: {'for': savedCards.getCardId('other') }" class="label">
-                    Enter a new card
-                </label>
-            </div>
-            <!--/ko-->
-            <div class="simplifycommerce-cards-title"
-                data-bind="visible: savedCards.selectedCard() == 'other'">
-                or enter a new credit card below:
-            </div>
-        <!--/ko-->
-        
-
-        <!-- Credit card form -->
-        <form class="form simplifycommerce-form" data-bind="visible: savedCards.selectedCard() == 'other'">
-            <!-- ko if: configuration.canSaveCard -->
-            <div class="field">
-              <div class="control">
-                  <input type="checkbox" name="payment[cc_save]" class="input-checkbox" value="1" id="simplifycommerce_cc_save"
-                         data-bind="
-                            checked: isStoreCreditCardChecked,
-                            attr: {
-                                autocomplete: off,
-                                id: getCode() + '_cc_save',
-                                title: $t('Save Credit Card'),
-                                'data-container': getCode() + '-cc-save'
-                            }"/>
-                  <label data-bind="attr: {for: getCode() + '_cc_save'}" class="label">
-                      <span>Save credit card for future use</span>
-                  </label>
+                <div class="field-tooltip toggle">
+                            <span class="field-tooltip-action action-vault"
+                                  tabindex="0"
+                                  data-toggle="dropdown"
+                                  data-bind="attr: {title: $t('What is this?')}, mageInit: {'dropdown':{'activeClass': '_active'}}">
+                                <span translate="'What is this?'"></span>
+                            </span>
+                    <div class="field-tooltip-content"
+                         data-target="dropdown"
+                         translate="'We store you payment information securely on MasterCard servers via SSL.'"></div>
                 </div>
             </div>
             <!-- /ko -->
-
-            <!-- IFRAME with Simplify Hosted Payments form -->
-            <!-- ko if: configuration.hostedPaymentsEnabled -->
-            <div data-bind="afterRender: onSimplifyContainerRendered">
-                <iframe                 
-                    name="simplifycommerce-iframe"
-                    frameborder="0" 
-                    data-sc-key="PUBLIC-API-KEY"
-                    data-bind="
-                        afterRender: onSimplifyFrameRendered,
-                        attr: { 'data-sc-key': configuration.publicAPIKey }">
-                </iframe>
+            <!-- ko ifnot: isModal() -->
+            <div class="payment-method-simplifycommerce">
+                <iframe name="simplifycommerce-form" data-bind='attr: {"data-sc-key": getPublicKey()}'></iframe>
             </div>
-            <!-- /ko -->
-
-            <!-- Magento default credit card form -->
-            <!-- ko ifnot: configuration.hostedPaymentsEnabled -->
-                <!-- ko template: 'Magento_Payment/payment/cc-form' --><!-- /ko -->
-            <!-- /ko -->
-
-        </form>
-
+            <!--/ko-->
+        </fieldset>
         <div class="checkout-agreements-block">
             <!-- ko foreach: $parent.getRegion('before-place-order') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-
-        <!-- Place Order button, hidden if Simplify Hosted Payment form is used, 
-             as it already has its own Pay button -->
+        <!-- ko if: isModal() -->
         <div class="actions-toolbar">
             <div class="primary">
-                <button id="default-place-order"
-                        class="action primary checkout"
+                <button data-bind='visible: false, attr: {"data-sc-key": getPublicKey(), "data-redirect-url": getRedirectUrl(), "data-role": getCode() + "_pay"}'></button>
+                <button class="action primary checkout"
                         type="submit"
-                        data-bind="
-                            click: submitOrder,
-                            attr: { title: $t('Place Order') },
-                            visible: isPayButtonVisible(),
-                            css: { disabled: !isPlaceOrderActionAllowed() }
-                        ">
-                    <span data-bind="text: $t('Place Order')"></span>
+                        data-bind='click: savePayment, enable: (getCode() == isChecked())'
+                        disabled>
+                    <span data-bind="i18n: 'Pay'"></span>
                 </button>
             </div>
         </div>
+        <!--/ko-->
     </div>
 </div>

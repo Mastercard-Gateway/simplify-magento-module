@@ -15,42 +15,30 @@
                     <label>Display Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
-				<field id="public_key" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="20" translate="label" type="text">
+				<field id="public_key" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="30" translate="label" type="text">
 					<label>Public API Key</label>
 				</field>
-				<field id="private_key" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="20" translate="label" type="obscure">
+				<field id="private_key" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="40" translate="label" type="obscure">
 					<label>Private API Key</label>
 					<backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
 				</field>
+                <field id="debug" translate="label" type="select" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="payment_action" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment Action</label>
+                    <source_model>MasterCard\SimplifyCommerce\Model\Adminhtml\Source\PaymentAction</source_model>
+                </field>
                 <field id="order_status" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select">
                     <label>New Order Status</label>
                     <source_model>MasterCard\SimplifyCommerce\Model\Config\Source\Order\Status\Pendingpayment</source_model>
                 </field>
-                <field id="payment_action" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="80" translate="label" type="select">
-                    <label>Payment Action</label>
-                    <source_model>MasterCard\SimplifyCommerce\Model\Source\Action</source_model>
-                </field>
-                <field id="simplify_hostedpayments" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="select">
-                    <label>Use Simplify Hosted Payments</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Credit card input form from Simplify Commerce will be used, for better security and PCI compliance</comment>
-                </field>
-                <field id="customer_save_credit_card" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="95" translate="label" type="select">
-                    <label>Customer can save credit card</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Allow customers credit card tokens to be saved for future use.</comment>
-                    <depends>
-                        <field id="simplify_hostedpayments">1</field>
-                    </depends>
-                </field>
-                <field id="cctypes" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="100" translate="label" type="multiselect">
-                    <label>Credit Card Types</label>
-                    <source_model>MasterCard\SimplifyCommerce\Model\Source\Cctype</source_model>
-                </field>
-                <field id="currencies" translate="label" type="multiselect" sortOrder="105" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Accepted Currencies</label>
-                    <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
-                </field>
+<!--                <field id="payment_form_type" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="select">-->
+<!--                    <label>Payment Form Type</label>-->
+<!--                    <source_model>MasterCard\SimplifyCommerce\Model\Config\Source\FormType</source_model>-->
+<!--                    <comment>You have the option of presenting the hosted payment form as either a modal or embedding it directly on your page.</comment>-->
+<!--                </field>-->
                 <field id="allowspecific" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="110" translate="label" type="allowspecific">
                     <label>Payment from Applicable Countries</label>
                     <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -62,6 +50,11 @@
                     <depends>
                         <field id="allowspecific">1</field>
                     </depends>
+                </field>
+                <field id="vault_active" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Vault Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/simplifycommerce_vault/active</config_path>
                 </field>
             </group>
         </section>

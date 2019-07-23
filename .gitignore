@@ -9,3 +9,5 @@
 dist
 *.iml
 *.log
+phpdoc-cache-*.*
+/lib/simplifycommerce-sdk-php/doc

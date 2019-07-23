@@ -3,15 +3,18 @@
 ## Overview
 Simplify Commerce Payment Gateway module is a free Magento 2 module that adds Simplify Commerce as payment method on your Magento 2 checkout page. With simple configuration steps described below you can quickly start using Simplify Commerce's secure payment form for receiving payments in your online store. 
 
-The module allows payments using Simplify Commerce Hosted Payments. Simplify Commerce Hosted Payments handle credit card data in safe and secure way, with full compliance with legal requirements. We use state-of-the-art encryption and tokenization to securely get payment information from your customer to our database. We monitor every transaction and manage sensitive payment data on our Level 1 PCI certified servers, which makes PCI compliance easier for you. Optionally, you can still use Magento's own credit card input form, if you prefer that, while payments will still be executed by Simplify Commerce API.
+The module allows payments using Simplify Commerce Hosted Payments. Simplify Commerce Hosted Payments handle credit card data in safe and secure way, with full compliance with legal requirements. We use state-of-the-art encryption and tokenization to securely get payment information from your customer to our database. We monitor every transaction and manage sensitive payment data on our Level 1 PCI certified servers, which makes PCI compliance easier for you.
 
 
 ## Prerequisites
-### Magento 2.1
-The module requires Magento 2.1 or newer. It supports both Community Edition and Enterprise Edition. 
+### Magento 2
+This module is compatible with:
+- Magento 2.2
+- Magento 2.3
 
-### Magento 2.1
-Customer account at Magento Marketplace website at [https://marketplace.magento.com](https://marketplace.magento.com) and access keys. Once you register and log in, navigate to *My Access Keys* and create a new pair of access keys on Magento 2 tab. Note both the public and the private key, you will need them later during installation of the module. 
+Community and Commerce Edition are both supported.
+ 
+
 
 ### Composer
 To download and install the components you need Composer, a PHP package manager. If it's not yet there on your Magento 2 server, install it first. Please follow the instructions specific for your operating system: [https://getcomposer.org/doc/00-intro.md](https://getcomposer.org/doc/00-intro.md)
@@ -39,7 +42,7 @@ Log on to your Magento 2 server and navigate to Magento installation folder. The
 Run the following commands to download and install the module:
 
     composer config repositories.mastercard-module-simplifycommerce git https://github.com/simplifycom/simplify-magento-module.git
-    composer require mastercard/module-simplifycommerce:2.1.6 --prefer-dist
+    composer require mastercard/module-simplifycommerce:~2.2.0 --prefer-dist
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 
@@ -50,7 +53,7 @@ Verify whether the module has been succesfully installed. Log in to Magento Admi
 ### Manual installation 
 If you prefer to deploy and install the module without Composer, proceed with the following steps:
 
-Download module files from [https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip](https://github.com/simplifycom/simplify-magento-module/archive/2.1.6.zip)
+Download module from [https://github.com/simplifycom/simplify-magento-module/releases](https://github.com/simplifycom/simplify-magento-module/releases)
 
 Create folder structure inside the the Magento main folder:
 
@@ -93,13 +96,9 @@ The following settings are available in Simplify Commerce Payment Gateway config
 * *Private API Key*: the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
 * *Display Order*: position, at which this payment method should be listed on checkout page
 * *New Order Status*: status assigned to a newly created order, before the payment has been received
-* *Payment Action*: determines when the buyer's credit card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.
-* *Use Simplify Hosted Payments*: if YES, hosted payment form from Simplify Commerce is used to enter the credit card data. In this scenario no credit card data is ever processed or stored in your Magento 2 system. This is the most secure and recommended solution.
-* *Customer can save credit card*: if YES, the customer can store credit cards in Simplify Commerce for future use. This option is only available, when Simplify Hosted Payments are enabled. 
-* *Credit Card Types*: card types that should be accepted in your online store   
-* *Accepted Currencies*: currencies accepted in your online store
+* *Payment Action*: determines when the buyer's credit card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.    
 * *Payment from Applicable Countries*: countries from which customers are allowed in your online store
-
+* *Vault*: if enabled, provides store customers with ability to use the previously saved credit card information for checkout and Magento Instant Purchase frature
 
 ## License
 This software is Open Source, released under the BSD 3-Clause license. See [LICENSE.md](LICENSE.md) for more info.
