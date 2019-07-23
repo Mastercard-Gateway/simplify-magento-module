@@ -38,8 +38,6 @@ class SimplifyAdapterFactory
      */
     public function create()
     {
-        require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'simplifycommerce-sdk-php/lib/Simplify.php';
-
         return $this->objectManager->create(SimplifyAdapter::class, [
             'publicKey' => $this->config->getValue('public_key'),
             'privateKey' => $this->config->getValue('private_key'),

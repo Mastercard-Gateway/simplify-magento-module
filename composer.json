@@ -10,7 +10,7 @@
         },
         {
             "name": "On Tap Networks Ltd",
-            "email": "kristjan@ontapgroup.com"
+            "email": "info@ontapgroup.com"
         }
     ],
     "minimum-stability": "alpha",
@@ -24,6 +24,9 @@
         "psr-4": {
             "MasterCard\\SimplifyCommerce\\": ""
         },
+        "classmap": [
+            "lib/simplifycommerce-sdk-php/lib/"
+        ],
         "files": [
             "registration.php"
         ]
