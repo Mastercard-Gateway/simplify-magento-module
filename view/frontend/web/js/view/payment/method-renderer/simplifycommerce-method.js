@@ -90,7 +90,10 @@ define([
 
         savePaymentCallback: function () {
             fullScreenLoader.startLoader();
-
+            this.isPlaceOrderActionAllowed(false);
+            setTimeout(function () {
+                fullScreenLoader.stopLoader();
+            }.bind(this), 1000);
             var button = $('button[data-role=' + this.getCode() + '_pay]');
             button.trigger('click');
         },

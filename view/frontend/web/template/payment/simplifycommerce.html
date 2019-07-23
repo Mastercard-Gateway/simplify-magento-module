@@ -57,7 +57,7 @@
                 <button data-bind='visible: false, attr: {"data-sc-key": getPublicKey(), "data-redirect-url": getRedirectUrl(), "data-role": getCode() + "_pay"}'></button>
                 <button class="action primary checkout"
                         type="submit"
-                        data-bind='click: savePayment, enable: (getCode() == isChecked())'
+                        data-bind='click: savePayment, enable: (getCode() == isChecked()), css: {disabled: !isPlaceOrderActionAllowed()}'
                         disabled>
                     <span data-bind="i18n: 'Pay'"></span>
                 </button>
