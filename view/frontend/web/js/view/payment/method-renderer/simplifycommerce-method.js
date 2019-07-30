@@ -133,7 +133,11 @@ define([
          */
         paymentCallback: function (data) {
             this.responseData = JSON.stringify(data);
-            SimplifyCommerce.enablePayBtn();
+            if (data.close && data.close === true) {
+                fullScreenLoader.stopLoader();
+                this.isPlaceOrderActionAllowed(true);
+                return;
+            }
             this.placeOrder();
         },
 
