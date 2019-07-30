@@ -9,9 +9,12 @@ use Exception;
 use InvalidArgumentException;
 use Magento\Checkout\Api\AgreementsValidatorInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Checkout\Model\Type\Onepage;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\CartManagementInterface;
@@ -47,6 +50,11 @@ class PlaceOrder extends Action
     protected $cartManagement;
 
     /**
+     * @var CustomerSession
+     */
+    protected $customerSession;
+
+    /**
      * Redirect constructor.
      * @param Context $context
      * @param ConfigInterface $config
@@ -59,13 +67,15 @@ class PlaceOrder extends Action
         ConfigInterface $config,
         CheckoutSession $checkoutSession,
         LoggerInterface $logger,
-        CartManagementInterface $cartManagement
+        CartManagementInterface $cartManagement,
+        CustomerSession $customerSession
     ) {
         parent::__construct($context);
         $this->config = $config;
         $this->checkoutSession = $checkoutSession;
         $this->logger = $logger;
         $this->cartManagement = $cartManagement;
+        $this->customerSession = $customerSession;
     }
 
     /**
@@ -76,7 +86,7 @@ class PlaceOrder extends Action
         if (!$this->config->getValue('active')) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
 
-            /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+            /** @var Redirect $resultRedirect */
             $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('noRoute');
 
@@ -107,6 +117,12 @@ class PlaceOrder extends Action
         $quote = $this->checkoutSession->getQuote();
 
         try {
+            $checkoutMethod = Onepage::METHOD_GUEST;
+            if ($this->customerSession->isLoggedIn()) {
+                $checkoutMethod = Onepage::METHOD_REGISTER;
+            }
+            $quote->setCheckoutMethod($checkoutMethod);
+
             $this->validateQuote($quote);
 
             $quote->getPayment()->setAdditionalInformation('response', Zend_Json_Encoder::encode([
@@ -115,7 +131,7 @@ class PlaceOrder extends Action
 
             $this->cartManagement->placeOrder($quote->getId());
 
-            /** @var \Magento\Framework\Controller\Result\Redirect $resultRedirect */
+            /** @var Redirect $resultRedirect */
             return $resultRedirect->setPath('checkout/onepage/success', ['_secure' => true]);
         } catch (Exception $e) {
             $this->logger->critical($e);
