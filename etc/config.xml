@@ -8,7 +8,7 @@
                 <active>0</active>
                 <model>SimplifyFacade</model>
                 <payment_action>authorize_capture</payment_action>
-                <title>Credit Card by Simplify Commerce</title>
+                <title>Pay with Card</title>
                 <order_status>processing</order_status>
 				<public_key />
 				<private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
