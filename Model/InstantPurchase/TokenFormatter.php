@@ -1,6 +1,7 @@
 <?php
 /**
- * Copyright (c) On Tap Networks Limited.
+ * Copyright (c) 2019 Mastercard. Licensed under Open Software License ("OSL") v. 3.0.
+ * See file LICENSE.txt or go to https://opensource.org/licenses/OSL-3.0 for full license details.
  */
 
 namespace MasterCard\SimplifyCommerce\Model\InstantPurchase;
@@ -16,7 +17,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
     public static $baseCardTypes = [
         'AE' => 'American Express',
         'VI' => 'Visa',
-        'MC' => 'MasterCard',
+        'MC' => 'Mastercard',
         'DI' => 'Discover',
         'JBC' => 'JBC',
         'CUP' => 'China Union Pay',
@@ -30,7 +31,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
     {
         $details = json_decode($paymentToken->getTokenDetails() ?: '{}', true);
         if (!isset($details['type'], $details['last4'], $details['expMonth'], $details['expYear'])) {
-            throw new \InvalidArgumentException('Invalid Simplify credit card token details.');
+            throw new \InvalidArgumentException('Invalid Simplify card token details.');
         }
 
         if (isset(self::$baseCardTypes[$details['type']])) {
@@ -41,7 +42,7 @@ class TokenFormatter implements PaymentTokenFormatterInterface
 
         $formatted = sprintf(
             '%s: %s, %s: %s (%s: %s/%s)',
-            __('Credit Card'),
+            __('Card'),
             $ccType,
             __('ending'),
             $details['last4'],

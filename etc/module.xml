@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2019 Mastercard. Licensed under Open Software License ("OSL") v. 3.0.
+  ~ See file LICENSE.txt or go to https://opensource.org/licenses/OSL-3.0 for full license details.
+  -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="MasterCard_SimplifyCommerce" setup_version="2.2.0">
+    <module name="MasterCard_SimplifyCommerce" setup_version="3.0.0">
         <sequence>
             <module name="Magento_Customer"/>
             <module name="Magento_Payment"/>

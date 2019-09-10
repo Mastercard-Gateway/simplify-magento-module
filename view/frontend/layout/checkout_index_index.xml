@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2019 Mastercard. Licensed under Open Software License ("OSL") v. 3.0.
+  ~ See file LICENSE.txt or go to https://opensource.org/licenses/OSL-3.0 for full license details.
+  -->
+
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.root">

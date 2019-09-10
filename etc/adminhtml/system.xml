@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2019 Mastercard. Licensed under Open Software License ("OSL") v. 3.0.
+  ~ See file LICENSE.txt or go to https://opensource.org/licenses/OSL-3.0 for full license details.
+  -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
             <group id="simplifycommerce" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="text">
-                <label>Simplify Commerce by MasterCard</label>
+                <label>Simplify Commerce by Mastercard</label>
                 <field id="active" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -34,11 +39,6 @@
                     <label>New Order Status</label>
                     <source_model>MasterCard\SimplifyCommerce\Model\Config\Source\Order\Status\Pendingpayment</source_model>
                 </field>
-<!--                <field id="payment_form_type" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="select">-->
-<!--                    <label>Payment Form Type</label>-->
-<!--                    <source_model>MasterCard\SimplifyCommerce\Model\Config\Source\FormType</source_model>-->
-<!--                    <comment>You have the option of presenting the hosted payment form as either a modal or embedding it directly on your page.</comment>-->
-<!--                </field>-->
                 <field id="allowspecific" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="110" translate="label" type="allowspecific">
                     <label>Payment from Applicable Countries</label>
                     <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>

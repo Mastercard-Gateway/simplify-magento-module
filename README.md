@@ -3,7 +3,7 @@
 ## Overview
 Simplify Commerce Payment Gateway module is a free Magento 2 module that adds Simplify Commerce as payment method on your Magento 2 checkout page. With simple configuration steps described below you can quickly start using Simplify Commerce's secure payment form for receiving payments in your online store. 
 
-The module allows payments using Simplify Commerce Hosted Payments. Simplify Commerce Hosted Payments handle credit card data in safe and secure way, with full compliance with legal requirements. We use state-of-the-art encryption and tokenization to securely get payment information from your customer to our database. We monitor every transaction and manage sensitive payment data on our Level 1 PCI certified servers, which makes PCI compliance easier for you.
+The module allows payments using Simplify Commerce Hosted Payments. Simplify Commerce Hosted Payments handle card data in safe and secure way, with full compliance with legal requirements. We use state-of-the-art encryption and tokenization to securely get payment information from your customer to our database. We monitor every transaction and manage sensitive payment data on our Level 1 PCI certified servers, which makes PCI compliance easier for you.
 
 
 ## Prerequisites
@@ -42,7 +42,7 @@ Log on to your Magento 2 server and navigate to Magento installation folder. The
 Run the following commands to download and install the module:
 
     composer config repositories.mastercard-module-simplifycommerce git https://github.com/simplifycom/simplify-magento-module.git
-    composer require mastercard/module-simplifycommerce:~2.2.0 --prefer-dist
+    composer require mastercard/module-simplifycommerce:~3.0.0 --prefer-dist
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 
@@ -92,13 +92,13 @@ The following settings are available in Simplify Commerce Payment Gateway config
 
 * *Enabled*: should be set to YES, to make Simplify Commerce available as payment method on checkout page
 * *Title*: name of the payment method displayed on checkout page
-* *Public API Key*: secret key from your Simplify Commerce Merchant Dashboard. For testing the module please use the Sandbox key. Once you see that payments from Magento 2 with test credit card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment you will be able to receive payments from real credit cards.
+* *Public API Key*: secret key from your Simplify Commerce Merchant Dashboard. For testing the module please use the Sandbox key. Once you see that payments from Magento 2 with test card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment you will be able to receive payments from real credit cards.
 * *Private API Key*: the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
 * *Display Order*: position, at which this payment method should be listed on checkout page
 * *New Order Status*: status assigned to a newly created order, before the payment has been received
-* *Payment Action*: determines when the buyer's credit card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.    
+* *Payment Action*: determines when the buyer's card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.    
 * *Payment from Applicable Countries*: countries from which customers are allowed in your online store
-* *Vault*: if enabled, provides store customers with ability to use the previously saved credit card information for checkout and Magento Instant Purchase frature
+* *Vault*: if enabled, provides store customers with ability to use the previously saved card information for checkout and Magento Instant Purchase feature
 
 ## License
 This software is Open Source, released under the BSD 3-Clause license. See [LICENSE.md](LICENSE.md) for more info.

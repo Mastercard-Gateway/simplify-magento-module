@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright (c) 2019 Mastercard. Licensed under Open Software License ("OSL") v. 3.0.
+ * See file LICENSE.txt or go to https://opensource.org/licenses/OSL-3.0 for full license details.
  */
 namespace MasterCard\SimplifyCommerce\Model\Config\Source\Order\Status;
 
