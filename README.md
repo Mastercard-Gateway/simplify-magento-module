@@ -14,7 +14,7 @@ This module is compatible with:
 
 Community and Commerce Edition are both supported.
  
-
+The Standard payment form in some of the previous releases is now deprecated and out of support.
 
 ### Composer
 To download and install the components you need Composer, a PHP package manager. If it's not yet there on your Magento 2 server, install it first. Please follow the instructions specific for your operating system: [https://getcomposer.org/doc/00-intro.md](https://getcomposer.org/doc/00-intro.md)
