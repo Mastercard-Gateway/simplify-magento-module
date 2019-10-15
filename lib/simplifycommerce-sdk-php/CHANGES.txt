@@ -1,0 +1,31 @@
+28 Feb 2016    v1.5.0
+
+    Added Card data to Refund.
+
+18 Jan 2016    v1.4.0
+
+    Addition of Data Token.
+
+02 Dec 2015    v1.3.0
+
+    Addition of Fraud Check API and Transaction Review API.
+
+07 Nov 2014    v1.2.0
+
+    Addition of Authorization API and update to Payment API
+
+20 Jan 2014    v1.1.2
+
+    Upgrade to the invoice API.
+
+20 Jan 2014    v1.1.1
+
+   Added refunded fees data to the payment response.
+
+25 June 2013   version 1.0.1
+
+   Fixed error with timestamps on 32 bit machines.
+
+10 June 2013   version 1.0.0
+
+   Initial release

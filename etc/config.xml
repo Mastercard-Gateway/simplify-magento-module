@@ -1,24 +1,60 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2013-2019 Mastercard
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
             <simplifycommerce>
-                <debug>0</debug>
-                <active>1</active>
-                <model>MasterCard\SimplifyCommerce\Model\Payment</model>
+                <js_component_url><![CDATA[https://www.simplify.com/commerce/simplify.pay.js]]></js_component_url>
+                <debug>1</debug>
+                <active>0</active>
+                <model>SimplifyFacade</model>
                 <payment_action>authorize_capture</payment_action>
-                <title>Credit Card by Simplify Commerce</title>
+                <title>Pay with Card</title>
                 <order_status>processing</order_status>
-				<public_key></public_key>
-				<private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"></private_key>
-                <cctypes>AE,VI,MC,JCB,DI,DN</cctypes>
-                <currencies>AUD,USD</currencies>
+				<public_key />
+				<private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <payment_form_type>0</payment_form_type>
                 <allowspecific>0</allowspecific>
                 <sort_order>1</sort_order>
-                <simplify_hostedpayments>1</simplify_hostedpayments>
-                <min_order_total>0.50</min_order_total>
-                <customer_save_credit_card>0</customer_save_credit_card>
+                <can_initialize>0</can_initialize>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>0</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_void>1</can_void>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <can_authorize_vault>1</can_authorize_vault>
+                <can_capture_vault>1</can_capture_vault>
+                <can_use_internal>0</can_use_internal>
+                <privateInfoKeys />
+                <paymentInfoKeys>last4,type,expMonth,expYear,source,paymentStatus</paymentInfoKeys>
             </simplifycommerce>
+            <simplifycommerce_vault>
+                <model>SimplifyVaultFacade</model>
+                <title>Stored Cards (SimplifyCommerce)</title>
+                <instant_purchase>
+                    <available>MasterCard\SimplifyCommerce\Model\InstantPurchase\AvailabilityChecker</available>
+                    <tokenFormat>MasterCard\SimplifyCommerce\Model\InstantPurchase\TokenFormatter</tokenFormat>
+                    <additionalInformation>MasterCard\SimplifyCommerce\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
+                </instant_purchase>
+            </simplifycommerce_vault>
         </payment>
     </default>
 </config>
