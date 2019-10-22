@@ -101,4 +101,4 @@ The following settings are available in Simplify Commerce Payment Gateway config
 * *Vault*: if enabled, provides store customers with ability to use the previously saved card information for checkout and Magento Instant Purchase feature
 
 ## License
-This software is Open Source, released under the BSD 3-Clause license. See [LICENSE.md](LICENSE.md) for more info.
+This software is Open Source, released under the Apache License 2.0. See [LICENSE.md](LICENSE.md) for more info.
