@@ -67,6 +67,7 @@ abstract class AbstractTransaction implements ClientInterface
         try {
             $response['object'] = $this->process($data);
         } catch (\Simplify_ApiException $e) {
+            $log['detail'] = $e->describe();
             $log['field_errors'] = [];
             $log['exception'] = $e->getMessage();
             if ($e instanceof \Simplify_BadRequestException && $e->hasFieldErrors()) {

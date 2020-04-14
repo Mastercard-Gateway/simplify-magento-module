@@ -13,11 +13,8 @@
             "email": "info@ontapgroup.com"
         }
     ],
-    "minimum-stability": "alpha",
     "require": {
-        "php": "~7.0.0|~7.1.0|~7.2.0",
-        "magento/framework": "101.0.*|102.0.*",
-        "magento/magento-composer-installer": "*"
+        "magento/framework": "^101.0.0 | ^102.0.0"
     },
     "type": "magento2-module",
     "autoload": {
