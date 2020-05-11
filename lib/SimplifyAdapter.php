@@ -17,12 +17,12 @@
 
 namespace MasterCard\SimplifyCommerce\lib;
 
-use \Simplify;
-use \Simplify_Authorization;
-use \Simplify_Payment;
-use \Simplify_Refund;
-use \Simplify_CardToken;
-use \Simplify_Customer;
+use Simplify;
+use Simplify_Authorization;
+use Simplify_CardToken;
+use Simplify_Customer;
+use Simplify_Payment;
+use Simplify_Refund;
 
 class SimplifyAdapter
 {
@@ -33,9 +33,15 @@ class SimplifyAdapter
      */
     public function __construct($publicKey, $privateKey)
     {
+        // For cases where autoload classmap has not been applied
+        // e.g. module is installed in app/code
+        if (!class_exists('Simplify')) {
+            require_once __DIR__ . '/simplifycommerce-sdk-php/lib/Simplify.php';
+        }
+
         Simplify::$publicKey = $publicKey;
         Simplify::$privateKey = $privateKey;
-        Simplify::$userAgent = 'Magento-3.0.1';
+        Simplify::$userAgent = 'Magento-3.1.0';
     }
 
     /**
