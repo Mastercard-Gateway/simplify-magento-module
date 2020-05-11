@@ -28,9 +28,13 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Zend_Json_Encoder;
 
@@ -67,12 +71,31 @@ class PlaceOrder extends Action
     protected $customerSession;
 
     /**
+     * @var CookieManagerInterface
+     */
+    protected $cookieManager;
+
+    /**
+     * @var CookieMetadataFactory
+     */
+    protected $cookieMetadataFactory;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * Redirect constructor.
      * @param Context $context
      * @param ConfigInterface $config
      * @param CheckoutSession $checkoutSession
      * @param LoggerInterface $logger
      * @param CartManagementInterface $cartManagement
+     * @param CustomerSession $customerSession
+     * @param CookieManagerInterface $cookieManager
+     * @param CookieMetadataFactory $cookieMetadataFactory
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,
@@ -80,7 +103,10 @@ class PlaceOrder extends Action
         CheckoutSession $checkoutSession,
         LoggerInterface $logger,
         CartManagementInterface $cartManagement,
-        CustomerSession $customerSession
+        CustomerSession $customerSession,
+        CookieManagerInterface $cookieManager,
+        CookieMetadataFactory $cookieMetadataFactory,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context);
         $this->config = $config;
@@ -88,6 +114,9 @@ class PlaceOrder extends Action
         $this->logger = $logger;
         $this->cartManagement = $cartManagement;
         $this->customerSession = $customerSession;
+        $this->cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -121,6 +150,27 @@ class PlaceOrder extends Action
     }
 
     /**
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Stdlib\Cookie\CookieSizeLimitReachedException
+     * @throws \Magento\Framework\Stdlib\Cookie\FailureToSendException
+     */
+    protected function setInvalidationCookie()
+    {
+        try {
+            $store = $this->storeManager->getStore();
+            $cookieMeta = $this->cookieMetadataFactory->createPublicCookieMetadata()
+                ->setHttpOnly(false)
+                ->setDuration(86400) //24h
+                ->setPath($store->getStorePath());
+
+            $this->cookieManager->setPublicCookie('simplify_section_data_clean', '1', $cookieMeta);
+        } catch (\Exception $e) {
+            $this->logger->error('Simplify Commerce could not set Invalidation Cookie:' . $e->getMessage());
+        }
+    }
+
+    /**
      * @inheritDoc
      */
     public function execute()
@@ -142,6 +192,8 @@ class PlaceOrder extends Action
             ]));
 
             $this->cartManagement->placeOrder($quote->getId());
+
+            $this->setInvalidationCookie();
 
             /** @var Redirect $resultRedirect */
             return $resultRedirect->setPath('checkout/onepage/success', ['_secure' => true]);
