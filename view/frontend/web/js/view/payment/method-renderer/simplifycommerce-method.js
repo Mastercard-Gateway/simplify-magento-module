@@ -118,7 +118,8 @@ define([
 
             requirejs.load({
                 contextName: '_',
-                onScriptLoad: this.adapterLoaded.bind(this)
+                onScriptLoad: this.adapterLoaded.bind(this),
+                config: this.getConfig()
             }, this.getCode(), this.getConfig()['js_component_url']);
 
             return this;
