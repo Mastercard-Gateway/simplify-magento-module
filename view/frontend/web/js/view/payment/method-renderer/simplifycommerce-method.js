@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 Mastercard
+ * Copyright (c) 2013-2020 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ define([
     'Magento_Customer/js/customer-data',
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/action/set-payment-information',
+    'https://www.simplify.com/commerce/simplify.pay.js'
 ], function (
     $,
     Component,
@@ -95,39 +96,31 @@ define([
         savePayment: function () {
             $.when(
                 setPaymentInformationAction(this.messageContainer, this.getData())
-            ).done(this.savePaymentCallback.bind(this));
+            ).done(
+                this.savePaymentCallback.bind(this)
+            );
 
             return false;
         },
 
         savePaymentCallback: function () {
             fullScreenLoader.startLoader();
+
             this.isPlaceOrderActionAllowed(false);
+
             setTimeout(function () {
                 fullScreenLoader.stopLoader();
             }.bind(this), 1000);
-            var button = $('button[data-role=' + this.getCode() + '_pay]');
+
+            let button = $('button[data-role=' + this.getCode() + '_pay]');
             button.trigger('click');
         },
 
         /**
+         * Called by afterRender
          * @returns {exports}
          */
-        initChildren: function () {
-            this._super();
-
-            requirejs.load({
-                contextName: '_',
-                onScriptLoad: this.adapterLoaded.bind(this)
-            }, this.getCode(), this.getConfig()['js_component_url']);
-
-            return this;
-        },
-
-        /**
-         * void
-         */
-        adapterLoaded: function () {
+        initializeSimplify: function (button) {
             SimplifyCommerce.hostedPayments(
                 this.paymentCallback.bind(this),
                 {
@@ -157,7 +150,7 @@ define([
          * Get payment method data
          */
         getData: function () {
-            var data = this._super();
+            let data = this._super();
 
             if (!('additional_data' in data) || data['additional_data'] === null) {
                 data['additional_data'] = {};

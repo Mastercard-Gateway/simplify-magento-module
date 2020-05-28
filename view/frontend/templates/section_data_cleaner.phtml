@@ -1,4 +1,5 @@
-/*
+<?php
+/**
  * Copyright (c) 2013-2020 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,18 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-//
-//  Common
-//  _____________________________________________
-
-& when (@media-common = true) {
-  .payment-method-simplifycommerce {
-    iframe[name=simplifycommerce-form] {
-      width: 100%;
-      height: 414px;
-      overflow: hidden;
-      border: 0;
-    }
-  }
-}
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+<script>
+    require([
+        'jquery',
+        'underscore',
+        'Magento_Customer/js/section-config',
+        'Magento_Customer/js/customer-data'
+    ], function ($, _, sectionConfig, customerData) {
+        if (!_.isEmpty(String($.cookieStorage.get('simplify_section_data_clean')))) {
+            // customerData.reload(sectionConfig.getSectionNames(), true); // since 2.3.4
+            customerData.reload('*', true);
+            $.cookieStorage.set('simplify_section_data_clean', '');
+        }
+    });
+</script>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2019 Mastercard
+ * Copyright (c) 2013-2020 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
