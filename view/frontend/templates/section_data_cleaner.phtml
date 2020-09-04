@@ -20,12 +20,10 @@
     require([
         'jquery',
         'underscore',
-        'Magento_Customer/js/section-config',
-        'Magento_Customer/js/customer-data'
-    ], function ($, _, sectionConfig, customerData) {
+        'Magento_Checkout/js/empty-cart'
+    ], function ($, _, emptyCart) {
         if (!_.isEmpty(String($.cookieStorage.get('simplify_section_data_clean')))) {
-            // customerData.reload(sectionConfig.getSectionNames(), true); // since 2.3.4
-            customerData.reload('*', true);
+            emptyCart();
             $.cookieStorage.set('simplify_section_data_clean', '');
         }
     });
