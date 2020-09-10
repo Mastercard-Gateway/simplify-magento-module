@@ -1,16 +1,21 @@
 ## 3.0.3 (September 10, 2020)
 Changing terminology for payment actions to Authorization and Payment
+
 Fix the loading with production mode
 
 ## 3.0.2 (June 2, 2020)
 This release has multiple bugfixes and adds some optimizations.
 
-Optimizations
+Optimizations:
+
 JS component loading in checkout
+
 Composer metadata
 
-Fixes
+Fixes:
+
 PHP autoloader issue when package not installed via composer (classmap missing)
+
 Private content not correctly invalidated when checkout success page is requested
 
 ## 3.0.1 (November 6, 2019)
