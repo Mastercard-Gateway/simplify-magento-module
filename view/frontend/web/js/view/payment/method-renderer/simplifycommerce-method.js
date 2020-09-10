@@ -67,7 +67,49 @@ define([
         getVaultCode: function () {
             return this.getConfig()['vault_code'];
         },
-
+        /**
+         * @returns {String}
+         */
+        getEmail: function () {
+            if(quote.guestEmail) return quote.guestEmail;
+            else return window.checkoutConfig.customerData.email;
+        },
+        /**
+         * @returns {String}
+         */
+        getLastName: function () {
+            return quote.billingAddress().lastname;
+        },
+        /**
+         * @returns {String}
+         */
+        getFirstName: function () {
+            return quote.billingAddress().firstname;
+        },
+        /**
+         * @returns {String}
+         */
+        getAddress: function () {
+            return quote.billingAddress().street[0]+", "+quote.billingAddress().postcode+" "+quote.billingAddress().city;
+        },
+        /**
+         * @returns {String}
+         */
+        getCity: function () {
+            return quote.billingAddress().city;
+        },
+        /**
+         * @returns {String}
+         */
+        getCountry: function () {
+            return quote.billingAddress().country;
+        },
+        /**
+         * @returns {String}
+         */
+        getPhone: function () {
+            return quote.billingAddress().telephone;
+        },
         /**
          * @returns {String}
          */
@@ -88,11 +130,9 @@ define([
         isModal: function () {
             return this.getConfig()['is_modal'];
         },
-
         getRedirectUrl: function () {
             return this.getConfig()['redirect_url'];
         },
-
         savePayment: function () {
             $.when(
                 setPaymentInformationAction(this.messageContainer, this.getData())
@@ -128,7 +168,11 @@ define([
                     amount: this.totals().base_grand_total * 100,
                     currency: this.totals().quote_currency_code,
                     reference: quote.getQuoteId(),
-                    operation: 'create.token'
+                    operation: 'create.token',
+                    customerEmail: this.getEmail(),
+                    customerName: this.getFirstName()+' '+this.getLastName(),
+                    address: this.getAddress(),
+                    addressCity: this.getCity()
                 }
             ).closeOnCompletion();
         },
