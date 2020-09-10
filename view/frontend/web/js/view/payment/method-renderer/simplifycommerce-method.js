@@ -25,8 +25,7 @@ define([
     'Magento_Checkout/js/model/place-order',
     'Magento_Customer/js/customer-data',
     'Magento_Vault/js/view/payment/vault-enabler',
-    'Magento_Checkout/js/action/set-payment-information',
-    'https://www.simplify.com/commerce/simplify.pay.js'
+    'Magento_Checkout/js/action/set-payment-information'
 ], function (
     $,
     Component,
@@ -121,16 +120,21 @@ define([
          * @returns {exports}
          */
         initializeSimplify: function (button) {
-            SimplifyCommerce.hostedPayments(
-                this.paymentCallback.bind(this),
-                {
-                    scKey: this.getConfig()['public_key'],
-                    amount: this.totals().base_grand_total * 100,
-                    currency: this.totals().quote_currency_code,
-                    reference: quote.getQuoteId(),
-                    operation: 'create.token'
-                }
-            ).closeOnCompletion();
+            requirejs.load({
+                contextName: '_',
+                onScriptLoad: function () {
+                    SimplifyCommerce.hostedPayments(
+                        this.paymentCallback.bind(this),
+                        {
+                            scKey: this.getConfig()['public_key'],
+                            amount: this.totals().base_grand_total * 100,
+                            currency: this.totals().quote_currency_code,
+                            reference: quote.getQuoteId(),
+                            operation: 'create.token'
+                        }
+                    ).closeOnCompletion();
+                }.bind(this)
+            }, this.getCode(), 'https://www.simplify.com/commerce/simplify.pay.js');
         },
 
         /**
