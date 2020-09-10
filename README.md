@@ -100,7 +100,7 @@ The following settings are available in Simplify Commerce Payment Gateway config
 * *Private API Key*: the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
 * *Display Order*: position, at which this payment method should be listed on checkout page
 * *New Order Status*: status assigned to a newly created order, before the payment has been received
-* *Payment Action*: determines when the buyer's card will be charged. If you select *Authorize and Capture*, the card will be charged immediately. If you select *Authorize*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.    
+* *Payment Action*: determines when the buyer's card will be charged. If you select *Payment*, the card will be charged immediately. If you select *Authorization*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.
 * *Payment from Applicable Countries*: countries from which customers are allowed in your online store
 * *Vault*: if enabled, provides store customers with ability to use the previously saved card information for checkout and Magento Instant Purchase feature
 
