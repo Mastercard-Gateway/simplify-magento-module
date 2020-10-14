@@ -30,7 +30,7 @@ class PaymentBuilder implements BuilderInterface
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $order = $paymentDO->getOrder();
-        $amount = (int) ((float) SubjectReader::readAmount($buildSubject) * 100);
+        $amount = (int) round((float) SubjectReader::readAmount($buildSubject) * 100);
 
         return [
             'amount' => $amount,
