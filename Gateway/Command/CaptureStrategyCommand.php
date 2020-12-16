@@ -28,6 +28,7 @@ use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Sales\Api\TransactionRepositoryInterface;
+use Magento\Sales\Model\Order\Payment;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
 use MasterCard\SimplifyCommerce\lib\SimplifyAdapterFactory;
 use Zend_Json_Decoder;
@@ -121,6 +122,7 @@ class CaptureStrategyCommand implements CommandInterface
      */
     private function getCommand(PaymentDataObjectInterface $paymentDO)
     {
+        /** @var Payment $payment */
         $payment = $paymentDO->getPayment();
 
         // if auth transaction does not exist then execute authorize&capture command

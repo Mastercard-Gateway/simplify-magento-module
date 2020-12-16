@@ -125,12 +125,12 @@ class PlaceOrder extends Action
     public function dispatch(RequestInterface $request)
     {
         if (!$this->config->getValue('active')) {
-            $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
+            $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, '1');
 
             /** @var Redirect $resultRedirect */
             $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('noRoute');
-
+            //@phpstan-ignore-next-line
             return $resultRedirect;
         }
 
@@ -144,6 +144,7 @@ class PlaceOrder extends Action
      */
     protected function validateQuote($quote)
     {
+        /** @var CartInterface|false $quote */
         if (!$quote || !$quote->getItemsCount()) {
             throw new InvalidArgumentException(__('We can\'t initialize checkout.'));
         }
