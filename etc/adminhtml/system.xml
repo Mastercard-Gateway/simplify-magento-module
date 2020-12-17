@@ -19,7 +19,7 @@
     <system>
         <section id="payment">
             <group id="simplifycommerce" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="text">
-                <label>Simplify Commerce by Mastercard</label>
+                <label>Mastercard Payment Gateway Services - Simplify</label>
                 <field id="active" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
