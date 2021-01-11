@@ -50,9 +50,9 @@
                 <model>SimplifyVaultFacade</model>
                 <title>Stored Cards (SimplifyCommerce)</title>
                 <instant_purchase>
-                    <available>MasterCard\SimplifyCommerce\Model\InstantPurchase\AvailabilityChecker</available>
-                    <tokenFormat>MasterCard\SimplifyCommerce\Model\InstantPurchase\TokenFormatter</tokenFormat>
-                    <additionalInformation>MasterCard\SimplifyCommerce\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
+                    <available>MastercardPaymentGatewayServices\Simplify\Model\InstantPurchase\AvailabilityChecker</available>
+                    <tokenFormat>MastercardPaymentGatewayServices\Simplify\Model\InstantPurchase\TokenFormatter</tokenFormat>
+                    <additionalInformation>MastercardPaymentGatewayServices\Simplify\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
                 </instant_purchase>
             </simplifycommerce_vault>
         </payment>

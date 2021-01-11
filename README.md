@@ -74,7 +74,7 @@ Verify whether the module has been succesfully installed. Log in to Magento Admi
 ### Deinstallation
 If you want to uninstall the previously installed Simplify Commerce Payment Gateway module, please run the following commands:
 
-    ./bin/magento module:uninstall MasterCard_SimplifyCommerce
+    ./bin/magento module:uninstall MastercardPaymentGatewayServices_Simplify
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 

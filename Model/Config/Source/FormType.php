@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Model\Config\Source;
+namespace MastercardPaymentGatewayServices\Simplify\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 

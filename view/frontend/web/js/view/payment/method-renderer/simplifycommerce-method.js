@@ -44,7 +44,7 @@ define([
 
     return Component.extend({
         defaults: {
-            template: 'MasterCard_SimplifyCommerce/payment/simplifycommerce'
+            template: 'MastercardPaymentGatewayServices_Simplify/payment/simplifycommerce'
         },
         totals: quote.getTotals(),
         responseData: null,

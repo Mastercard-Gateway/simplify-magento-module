@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Gateway\Command;
+namespace MastercardPaymentGatewayServices\Simplify\Gateway\Command;
 
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
@@ -30,7 +30,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
-use MasterCard\SimplifyCommerce\lib\SimplifyAdapterFactory;
+use MastercardPaymentGatewayServices\Simplify\lib\SimplifyAdapterFactory;
 use Zend_Json_Decoder;
 
 class CaptureStrategyCommand implements CommandInterface

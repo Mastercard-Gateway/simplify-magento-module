@@ -18,9 +18,9 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <virtualType name="SimplifyFacade" type="Magento\Payment\Model\Method\Adapter">
         <arguments>
-            <argument name="code" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::CODE</argument>
+            <argument name="code" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::CODE</argument>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form\Cc</argument>
-            <argument name="infoBlockType" xsi:type="string">MasterCard\SimplifyCommerce\Block\Info</argument>
+            <argument name="infoBlockType" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Block\Info</argument>
             <argument name="valueHandlerPool" xsi:type="object">SimplifyValueHandlerPool</argument>
             <argument name="validatorPool" xsi:type="object">SimplifyValidatorPool</argument>
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
@@ -29,11 +29,11 @@
     <virtualType name="SimplifyCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="capture" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Command\CaptureStrategyCommand</item>
+                <item name="capture" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Command\CaptureStrategyCommand</item>
                 <item name="token_sale" xsi:type="string">SimplifyTokenSaleCommand</item>
                 <item name="customer_sale" xsi:type="string">SimplifyCustomerSaleCommand</item>
                 <item name="settlement" xsi:type="string">SimplifySettlementCommand</item>
-                <item name="authorize" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Command\AuthorizeStrategyCommand</item>
+                <item name="authorize" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Command\AuthorizeStrategyCommand</item>
                 <item name="authorize_token" xsi:type="string">SimplifyAuthorizeTokenCommand</item>
                 <item name="create_customer" xsi:type="string">SimplifyCreateCustomerCommand</item>
                 <item name="authorize_customer" xsi:type="string">SimplifyAuthorizeCustomerCommand</item>
@@ -45,17 +45,17 @@
             </argument>
         </arguments>
     </virtualType>
-    <type name="MasterCard\SimplifyCommerce\Block\Info">
+    <type name="MastercardPaymentGatewayServices\Simplify\Block\Info">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
     </type>
-    <type name="MasterCard\SimplifyCommerce\Gateway\Command\CaptureStrategyCommand">
+    <type name="MastercardPaymentGatewayServices\Simplify\Gateway\Command\CaptureStrategyCommand">
         <arguments>
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
         </arguments>
     </type>
-    <type name="MasterCard\SimplifyCommerce\Gateway\Command\AuthorizeStrategyCommand">
+    <type name="MastercardPaymentGatewayServices\Simplify\Gateway\Command\AuthorizeStrategyCommand">
         <arguments>
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
         </arguments>
@@ -63,140 +63,140 @@
     <virtualType name="SimplifyAuthorizeTokenCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyTokenPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentAuthorize</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentAuthorize</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
             <argument name="handler" xsi:type="object">SimplifyAuthorizeHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyAuthorizeCustomerCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyCustomerPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentAuthorize</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentAuthorize</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
             <argument name="handler" xsi:type="object">SimplifyAuthorizeHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyCreateCustomerCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyCustomerBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\CustomerCreate</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\CustomerValidator</argument>
-            <argument name="handler" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Response\CustomerHandler</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\CustomerCreate</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\CustomerValidator</argument>
+            <argument name="handler" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Response\CustomerHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyAuthorizeHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="authorizeHandler" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Response\AuthorizationHandler</item>
-                <item name="tokenHandler" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Response\TokenHandler</item>
+                <item name="authorizeHandler" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Response\AuthorizationHandler</item>
+                <item name="tokenHandler" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Response\TokenHandler</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyTokenPaymentBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="cardToken" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\CardTokenBuilder</item>
-                <item name="payment" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\PaymentBuilder</item>
+                <item name="cardToken" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\CardTokenBuilder</item>
+                <item name="payment" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\PaymentBuilder</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyCustomerPaymentBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="customerId" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\CustomerIdBuilder</item>
-                <item name="payment" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\PaymentBuilder</item>
+                <item name="customerId" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\CustomerIdBuilder</item>
+                <item name="payment" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\PaymentBuilder</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyCustomerBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="cardToken" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\CardTokenBuilder</item>
-                <item name="customer" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\CustomerBuilder</item>
+                <item name="cardToken" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\CardTokenBuilder</item>
+                <item name="customer" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\CustomerBuilder</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifySettlementCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyAuthorizedPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentCapture</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
-            <argument name="handler" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Response\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentCapture</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
+            <argument name="handler" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Response\CaptureHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyAuthorizedPaymentBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="authorizationId" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\AuthorizationIdBuilder</item>
-                <item name="payment" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\PaymentBuilder</item>
+                <item name="authorizationId" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\AuthorizationIdBuilder</item>
+                <item name="payment" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\PaymentBuilder</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyTokenSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyTokenPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentCapture</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentCapture</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
             <argument name="handler" xsi:type="object">SimplifyCaptureHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyCustomerSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyCustomerPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentCapture</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentCapture</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
             <argument name="handler" xsi:type="object">SimplifyCaptureHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyCaptureHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="captureHandler" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Response\CaptureHandler</item>
-                <item name="tokenHandler" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Response\TokenHandler</item>
+                <item name="captureHandler" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Response\CaptureHandler</item>
+                <item name="tokenHandler" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Response\TokenHandler</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Request\AuthorizationIdBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentVoid</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\ValidateTrue</argument>
+            <argument name="requestBuilder" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Request\AuthorizationIdBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentVoid</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\ValidateTrue</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyRefundPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentRefund</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentRefund</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyRefundPaymentBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="paymentId" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\PaymentIdBuilder</item>
-                <item name="payment" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\PaymentBuilder</item>
+                <item name="paymentId" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\PaymentIdBuilder</item>
+                <item name="payment" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\PaymentBuilder</item>
             </argument>
         </arguments>
     </virtualType>
-    <type name="MasterCard\SimplifyCommerce\lib\SimplifyAdapterFactory">
+    <type name="MastercardPaymentGatewayServices\Simplify\lib\SimplifyAdapterFactory">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
     </type>
-    <type name="MasterCard\SimplifyCommerce\Gateway\Http\Client\AbstractTransaction">
+    <type name="MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\AbstractTransaction">
         <arguments>
             <argument name="logger" xsi:type="object">SimplifyLogger</argument>
         </arguments>
     </type>
-    <type name="MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory">
+    <type name="MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
@@ -232,10 +232,10 @@
     </virtualType>
     <virtualType name="SimplifyConfig" type="Magento\Payment\Gateway\Config\Config">
         <arguments>
-            <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::CODE</argument>
+            <argument name="methodCode" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::CODE</argument>
         </arguments>
     </virtualType>
-    <type name="MasterCard\SimplifyCommerce\Ui\ConfigProvider">
+    <type name="MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
@@ -245,37 +245,37 @@
     <virtualType name="SimplifyVaultSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyVaultPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentCapture</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
-            <argument name="handler" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Response\CaptureHandler</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentCapture</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
+            <argument name="handler" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Response\CaptureHandler</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVaultPaymentBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="token" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\VaultTokenBuilder</item>
-                <item name="payment" xsi:type="string">MasterCard\SimplifyCommerce\Gateway\Request\PaymentBuilder</item>
+                <item name="token" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\VaultTokenBuilder</item>
+                <item name="payment" xsi:type="string">MastercardPaymentGatewayServices\Simplify\Gateway\Request\PaymentBuilder</item>
             </argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyVaultPaymentBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentAuthorize</argument>
-            <argument name="validator" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Validator\PaymentValidator</argument>
-            <argument name="handler" xsi:type="object">MasterCard\SimplifyCommerce\Gateway\Response\AuthorizationHandler</argument>
+            <argument name="transferFactory" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client\PaymentAuthorize</argument>
+            <argument name="validator" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Validator\PaymentValidator</argument>
+            <argument name="handler" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Gateway\Response\AuthorizationHandler</argument>
         </arguments>
     </virtualType>
-    <type name="MasterCard\SimplifyCommerce\Gateway\Response\TokenHandler">
+    <type name="MastercardPaymentGatewayServices\Simplify\Gateway\Response\TokenHandler">
         <arguments>
             <argument name="paymentTokenFactory" xsi:type="object">Magento\Vault\Model\CreditCardTokenFactory</argument>
         </arguments>
     </type>
     <virtualType name="SimplifyVaultPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
         <arguments>
-            <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_CODE</argument>
+            <argument name="methodCode" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::VAULT_CODE</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVaultPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
@@ -295,7 +295,7 @@
             <argument name="config" xsi:type="object">SimplifyVaultPaymentConfig</argument>
             <argument name="valueHandlerPool" xsi:type="object">SimplifyVaultPaymentValueHandlerPool</argument>
             <argument name="vaultProvider" xsi:type="object">SimplifyFacade</argument>
-            <argument name="code" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_CODE</argument>
+            <argument name="code" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::VAULT_CODE</argument>
         </arguments>
     </virtualType>
     <type name="Magento\Payment\Gateway\Command\CommandManagerPool">

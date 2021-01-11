@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\lib;
+namespace MastercardPaymentGatewayServices\Simplify\lib;
 
 use Simplify;
 use Simplify_Authorization;

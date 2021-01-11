@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Controller\Simplify;
+namespace MastercardPaymentGatewayServices\Simplify\Controller\Simplify;
 
 use Exception;
 use InvalidArgumentException;
