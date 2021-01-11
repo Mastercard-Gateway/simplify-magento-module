@@ -17,7 +17,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="before.body.end">
-            <block name="simplify_section_data_cleaner" template="Mastercard_PaymentGatewayServiceSimplify::section_data_cleaner.phtml" />
+            <block name="simplify_section_data_cleaner" template="MastercardPaymentGatewayServices_Simplify::section_data_cleaner.phtml" />
         </referenceContainer>
     </body>
 </page>
