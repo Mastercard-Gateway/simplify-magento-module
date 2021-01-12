@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace MasterCard\SimplifyCommerce\Model\Adminhtml\Source;
+namespace MastercardPaymentGatewayServices\Simplify\Model\Adminhtml\Source;
 
 use Magento\Framework\Option\ArrayInterface;
 use Magento\Payment\Model\Method\AbstractMethod;

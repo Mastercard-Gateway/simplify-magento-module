@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Model\InstantPurchase;
+namespace MastercardPaymentGatewayServices\Simplify\Model\InstantPurchase;
 
 use Magento\InstantPurchase\PaymentMethodIntegration\AvailabilityCheckerInterface;
 

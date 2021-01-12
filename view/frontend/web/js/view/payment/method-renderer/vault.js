@@ -20,7 +20,7 @@ define([
 
     return VaultComponent.extend({
         defaults: {
-            template: 'MasterCard_SimplifyCommerce/payment/vault',
+            template: 'MastercardPaymentGatewayServices_Simplify/payment/vault',
         },
 
         /**

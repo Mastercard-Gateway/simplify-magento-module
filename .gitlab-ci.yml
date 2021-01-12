@@ -52,7 +52,7 @@ magento-2.3:build:
     - composer.phar require --dev --no-update --no-suggest ontap/ambassador:^1.0
     - composer.phar config minimum-stability dev
     - composer.phar config prefer-stable true
-    - composer.phar require --no-update --no-suggest mastercard/module-simplifycommerce:dev-build
+    - composer.phar require --no-update --no-suggest mastercard/module-paymentgatewayservice-simplify:dev-build
     - composer.phar install --no-progress --no-suggest --optimize-autoloader
     - php ./vendor/bin/install-ambassador
 

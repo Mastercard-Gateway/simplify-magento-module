@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Gateway\Response;
+namespace MastercardPaymentGatewayServices\Simplify\Gateway\Response;
 
 use DateInterval;
 use DateTime;

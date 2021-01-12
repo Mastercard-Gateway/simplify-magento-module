@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Gateway\Http\Client;
+namespace MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client;
 
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Gateway\Http\ClientException;
-use MasterCard\SimplifyCommerce\lib\SimplifyAdapterFactory;
+use MastercardPaymentGatewayServices\Simplify\lib\SimplifyAdapterFactory;
 use Magento\Payment\Model\Method\Logger;
 
 abstract class AbstractTransaction implements ClientInterface
