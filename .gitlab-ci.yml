@@ -92,3 +92,40 @@ magento-2.3.6:compile:
     - cd _build/magento
     - php bin/magento module:enable --all
     - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
+
+
+magento-2.4.1:build:
+  image: ontap/magento:2.4.1
+  stage: build
+  <<: *magento-build
+
+magento-2.4.1:phpcs:
+  image: ontap/php:7.4
+  stage: test_static
+  needs: ["magento-2.4.1:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento/$MODULE_DIR
+    - make phpcs
+
+magento-2.4.1:phpstan:
+  image: ontap/php:7.4
+  stage: test_static
+  needs: ["magento-2.4.1:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento/$MODULE_DIR
+    - make phpstan
+
+magento-2.4.1:compile:
+  image: ontap/php:7.4
+  stage: test_dependency_injection
+  needs: ["magento-2.4.1:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento
+    - php bin/magento module:enable --all
+    - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
