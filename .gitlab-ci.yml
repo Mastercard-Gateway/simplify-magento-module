@@ -55,7 +55,7 @@ sonarqube-check:
     - composer.phar require --dev --no-update --no-suggest ontap/ambassador:^1.2
     - composer.phar config minimum-stability dev
     - composer.phar config prefer-stable true
-    - composer.phar require --no-suggest --optimize-autoloader mastercard/module-paymentgatewayservice-simplify:dev-build
+    - composer.phar require --no-suggest --prefer-source mastercard/module-paymentgatewayservice-simplify:dev-build
 
 magento-2.3.6:build:
   image: ontap/magento:2.3.6
