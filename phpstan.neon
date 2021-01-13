@@ -1,0 +1,24 @@
+parameters:
+    reportUnmatchedIgnoredErrors: false
+    excludes_analyse:
+        - lib/simplifycommerce-sdk-php
+    ignoreErrors:
+        - '#Using \$this outside a class#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::(get|set|uns|has)[A-Z]#'
+        -
+            message: '#Variable \$(block|this) might not be defined.#'
+            paths:
+                - view/frontend/*
+                - view/adminhtml/*
+                - view/frontend/*
+                - view/adminhtml/*
+        -
+            message: '#Undefined variable: \$(block|this)#'
+            paths:
+                - view/frontend/*
+                - view/adminhtml/*
+                - view/frontend/*
+                - view/adminhtml/*
+    fileExtensions:
+        - php
+        - phtml

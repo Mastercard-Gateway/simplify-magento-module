@@ -1,17 +1,22 @@
 stages:
   - sonarqube
   - build
-  - test
+  - test_static
+  - test_dependency_injection
+
 
 cache:
   paths:
     - .cache/
 
+
 variables:
+  MODULE_DIR: 'vendor/mastercard/module-paymentgatewayservice-simplify'
   COMPOSER_MIRROR_PATH_REPOS: 1
   COMPOSER_ALLOW_SUPERUSER: 1
   COMPOSER_MEMORY_LIMIT: -1
   COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+
 
 sonarqube-check:
   stage: sonarqube
@@ -32,9 +37,7 @@ sonarqube-check:
     - merge_requests
     - master
 
-magento-2.3:build:
-  image: ontap/php:7.3
-  stage: build
+.magento:build: &magento-build
   artifacts:
     paths:
       - _build/
@@ -42,47 +45,87 @@ magento-2.3:build:
   only:
     - merge_requests
   script:
-    - mkdir -p _build/magento
+    - mkdir -p _build
+    - mv /magento _build/magento
     - git clone . _build/module
-    - (cd _build/module && git checkout -b build && sed -i '/"version"/d' composer.json)
+    - (cd _build/module && git checkout -b build && sed -i '/"version"/d' composer.json && cat composer.json)
     - cd _build/magento
-    - composer.phar create-project --no-install --repository=https://repo.magento.com/ magento/project-community-edition:2.3.5 .
     - composer.phar config repositories.ontap composer https://packages.ontapgroup.com/
     - composer.phar config repositories.modules path $CI_PROJECT_DIR/_build/module
-    - composer.phar require --dev --no-update --no-suggest ontap/ambassador:^1.0
+    - composer.phar require --dev --no-update --no-suggest ontap/ambassador:^1.2
     - composer.phar config minimum-stability dev
     - composer.phar config prefer-stable true
-    - composer.phar require --no-update --no-suggest mastercard/module-paymentgatewayservice-simplify:dev-build
-    - composer.phar install --no-progress --no-suggest --optimize-autoloader
-    - php ./vendor/bin/install-ambassador
+    - composer.phar require --no-suggest --optimize-autoloader mastercard/module-paymentgatewayservice-simplify:dev-build
 
-magento-2.3:phpcs:
-    image: ontap/php:7.3
-    stage: test
-    needs: ["magento-2.3:build"]
-    only:
-        - merge_requests
-    script:
-        - cd _build/magento
-        - make phpcs
+magento-2.3.6:build:
+  image: ontap/magento:2.3.6
+  stage: build
+  <<: *magento-build
 
-magento-2.3:phpstan:
-    image: ontap/php:7.3
-    stage: test
-    needs: ["magento-2.3:build"]
-    only:
-        - merge_requests
-    script:
-        - cd _build/magento
-        - make phpstan
+magento-2.3.6:phpcs:
+  image: ontap/php:7.3
+  stage: test_static
+  needs: ["magento-2.3.6:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento/$MODULE_DIR
+    - make phpcs
 
-magento-2.3:compile:
-    image: ontap/php:7.3
-    stage: test
-    needs: ["magento-2.3:build"]
-    only:
-        - merge_requests
-    script:
-        - cd _build/magento
-        - php bin/magento module:enable --all
-        - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
+magento-2.3.6:phpstan:
+  image: ontap/php:7.3
+  stage: test_static
+  needs: ["magento-2.3.6:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento/$MODULE_DIR
+    - make phpstan
+
+magento-2.3.6:compile:
+  image: ontap/php:7.3
+  stage: test_dependency_injection
+  needs: ["magento-2.3.6:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento
+    - php bin/magento module:enable --all
+    - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
+
+
+magento-2.4.1:build:
+  image: ontap/magento:2.4.1
+  stage: build
+  <<: *magento-build
+
+magento-2.4.1:phpcs:
+  image: ontap/php:7.4
+  stage: test_static
+  needs: ["magento-2.4.1:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento/$MODULE_DIR
+    - make phpcs
+
+magento-2.4.1:phpstan:
+  image: ontap/php:7.4
+  stage: test_static
+  needs: ["magento-2.4.1:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento/$MODULE_DIR
+    - make phpstan
+
+magento-2.4.1:compile:
+  image: ontap/php:7.4
+  stage: test_dependency_injection
+  needs: ["magento-2.4.1:build"]
+  only:
+    - merge_requests
+  script:
+    - cd _build/magento
+    - php bin/magento module:enable --all
+    - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction

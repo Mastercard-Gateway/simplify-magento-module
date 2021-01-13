@@ -72,7 +72,7 @@ class SimplifyAdapter
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return mixed
      */
     public function createCustomer($data)

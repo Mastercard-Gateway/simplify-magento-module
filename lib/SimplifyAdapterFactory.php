@@ -50,6 +50,7 @@ class SimplifyAdapterFactory
      */
     public function create()
     {
+        // phpcs:ignore
         return $this->objectManager->create(SimplifyAdapter::class, [
             'publicKey' => $this->config->getValue('public_key'),
             'privateKey' => $this->config->getValue('private_key'),
