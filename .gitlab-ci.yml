@@ -52,7 +52,7 @@ sonarqube-check:
     - cd _build/magento
     - composer.phar config repositories.ontap composer https://packages.ontapgroup.com/
     - composer.phar config repositories.modules path $CI_PROJECT_DIR/_build/module
-    - composer.phar require --dev --no-update --no-suggest ontap/ambassador:^1.2
+    - composer.phar require --dev --no-update --no-suggest ontap/ambassador:^1.2.1
     - composer.phar config minimum-stability dev
     - composer.phar config prefer-stable true
     - composer.phar require --no-suggest --optimize-autoloader mastercard/module-paymentgatewayservice-simplify:dev-build
