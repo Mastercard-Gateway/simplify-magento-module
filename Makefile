@@ -17,3 +17,6 @@ ifneq ("$(wildcard ./../../../../vendor/ontap/ambassador/Makefile)","")
 endif
 
 include $(MOD_PATH)/Makefile
+
+dist: ## Create a distributable archive
+	git archive HEAD -o ./module-mastercard.zip
