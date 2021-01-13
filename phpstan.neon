@@ -1,6 +1,6 @@
 parameters:
     reportUnmatchedIgnoredErrors: false
-    excludePaths:
+    excludes_analyse:
         - lib/simplifycommerce-sdk-php
     ignoreErrors:
         - '#Using \$this outside a class#'
