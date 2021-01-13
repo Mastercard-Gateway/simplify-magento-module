@@ -19,4 +19,4 @@ endif
 include $(MOD_PATH)/Makefile
 
 dist: ## Create a distributable archive
-	git archive HEAD -o ./module-mastercard.zip
+	git archive HEAD -o ./module-paymentgatewayservice-simplify.zip
