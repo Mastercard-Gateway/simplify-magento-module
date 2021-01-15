@@ -34,7 +34,7 @@ sonarqube-check:
 .magento:build: &magento-build
   before_script:
     - mkdir -p _build
-    - ln /magento _build/magento
+    - ln -s /magento _build/magento
     - git clone . _build/module
     - (cd _build/module && git checkout -b build && sed -i '/"version"/d' composer.json && cat composer.json)
     - cd _build/magento
