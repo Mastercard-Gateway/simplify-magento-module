@@ -53,8 +53,7 @@ magento-2.3.6:phpcs:
   only:
     - merge_requests
   script:
-    - cd _build/magento/$MODULE_DIR
-    - make phpcs
+    - (cd $MODULE_DIR && make phpcs)
   <<: *magento-build
 
 magento-2.3.6:phpstan:
@@ -63,8 +62,7 @@ magento-2.3.6:phpstan:
   only:
     - merge_requests
   script:
-    - cd _build/magento/$MODULE_DIR
-    - make phpstan
+    - (cd $MODULE_DIR && make phpstan)
   <<: *magento-build
 
 magento-2.3.6:compile:
@@ -73,7 +71,6 @@ magento-2.3.6:compile:
   only:
     - merge_requests
   script:
-    - cd _build/magento
     - php bin/magento module:enable --all
     - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
   <<: *magento-build
@@ -84,8 +81,7 @@ magento-2.4.1:phpcs:
   only:
     - merge_requests
   script:
-    - cd _build/magento/$MODULE_DIR
-    - make phpcs
+    - (cd $MODULE_DIR && make phpcs)
   <<: *magento-build
 
 magento-2.4.1:phpstan:
@@ -94,8 +90,7 @@ magento-2.4.1:phpstan:
   only:
     - merge_requests
   script:
-    - cd _build/magento/$MODULE_DIR
-    - make phpstan
+    - (cd $MODULE_DIR && make phpstan)
   <<: *magento-build
 
 magento-2.4.1:compile:
@@ -104,7 +99,6 @@ magento-2.4.1:compile:
   only:
     - merge_requests
   script:
-    - cd _build/magento
     - php bin/magento module:enable --all
     - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
   <<: *magento-build
