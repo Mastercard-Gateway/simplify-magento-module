@@ -19,7 +19,7 @@
     <system>
         <section id="payment">
             <group id="simplifycommerce" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label" type="text">
-                <label>Simplify Commerce by Mastercard</label>
+                <label>Mastercard Payment Gateway Services - Simplify</label>
                 <field id="active" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="10" translate="label" type="select">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -44,11 +44,11 @@
                 </field>
                 <field id="payment_action" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Payment Action</label>
-                    <source_model>MasterCard\SimplifyCommerce\Model\Adminhtml\Source\PaymentAction</source_model>
+                    <source_model>MastercardPaymentGatewayServices\Simplify\Model\Adminhtml\Source\PaymentAction</source_model>
                 </field>
                 <field id="order_status" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="70" translate="label" type="select">
                     <label>New Order Status</label>
-                    <source_model>MasterCard\SimplifyCommerce\Model\Config\Source\Order\Status\Pendingpayment</source_model>
+                    <source_model>MastercardPaymentGatewayServices\Simplify\Model\Config\Source\Order\Status\Pendingpayment</source_model>
                 </field>
                 <field id="allowspecific" showInDefault="1" showInStore="0" showInWebsite="1" sortOrder="110" translate="label" type="allowspecific">
                     <label>Payment from Applicable Countries</label>

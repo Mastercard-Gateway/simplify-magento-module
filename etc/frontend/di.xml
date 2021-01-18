@@ -19,32 +19,32 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="simplifycommerce_config_provider" xsi:type="object">MasterCard\SimplifyCommerce\Ui\ConfigProvider</item>
+                <item name="simplifycommerce_config_provider" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider</item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\Vault\Model\Ui\TokensConfigProvider">
         <arguments>
             <argument name="tokenUiComponentProviders" xsi:type="array">
-                <item name="simplifycommerce" xsi:type="object">MasterCard\SimplifyCommerce\Ui\TokenUiComponentProvider</item>
+                <item name="simplifycommerce" xsi:type="object">MastercardPaymentGatewayServices\Simplify\Ui\TokenUiComponentProvider</item>
             </argument>
         </arguments>
     </type>
     <type name="Magento\Payment\Model\CcGenericConfigProvider">
         <arguments>
             <argument name="methodCodes" xsi:type="array">
-                <item name="simplifycommerce" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::CODE</item>
+                <item name="simplifycommerce" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::CODE</item>
             </argument>
         </arguments>
     </type>
-    <type name="MasterCard\SimplifyCommerce\Block\Info">
+    <type name="MastercardPaymentGatewayServices\Simplify\Block\Info">
         <arguments>
             <argument name="data" xsi:type="array">
                 <item xsi:type="string" name="is_secure_mode">1</item>
             </argument>
         </arguments>
     </type>
-    <type name="MasterCard\SimplifyCommerce\Controller\Simplify\PlaceOrder">
+    <type name="MastercardPaymentGatewayServices\Simplify\Controller\Simplify\PlaceOrder">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>

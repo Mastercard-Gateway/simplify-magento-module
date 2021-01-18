@@ -1,5 +1,5 @@
 {
-    "name": "mastercard/module-simplifycommerce",
+    "name": "mastercard/module-paymentgatewayservice-simplify",
     "version": "3.1.0",
     "description": "Mastercard Simplify Commerce",
     "license": "proprietary",
@@ -14,12 +14,12 @@
         }
     ],
     "require": {
-        "magento/framework": "^101.0.0 | ^102.0.0"
+        "magento/framework": "^101.0.0 | ^102.0.0 | ^103.0.0"
     },
     "type": "magento2-module",
     "autoload": {
         "psr-4": {
-            "MasterCard\\SimplifyCommerce\\": ""
+            "MastercardPaymentGatewayServices\\Simplify\\": ""
         },
         "classmap": [
             "lib/simplifycommerce-sdk-php/lib/"

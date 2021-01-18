@@ -11,6 +11,7 @@ The module allows payments using Simplify Commerce Hosted Payments. Simplify Com
 This module is compatible with:
 - Magento 2.2
 - Magento 2.3
+- Magento 2.4
 
 Community and Commerce Edition are both supported.
  
@@ -74,7 +75,7 @@ Verify whether the module has been succesfully installed. Log in to Magento Admi
 ### Deinstallation
 If you want to uninstall the previously installed Simplify Commerce Payment Gateway module, please run the following commands:
 
-    ./bin/magento module:uninstall MasterCard_SimplifyCommerce
+    ./bin/magento module:uninstall MastercardPaymentGatewayServices_Simplify
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 

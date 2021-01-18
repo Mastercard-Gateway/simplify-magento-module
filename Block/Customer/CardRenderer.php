@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Block\Customer;
+namespace MastercardPaymentGatewayServices\Simplify\Block\Customer;
 
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Block\AbstractCardRenderer;
-use MasterCard\SimplifyCommerce\Ui\ConfigProvider;
+use MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider;
 
 class CardRenderer extends AbstractCardRenderer
 {

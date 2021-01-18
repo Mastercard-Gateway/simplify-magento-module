@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Ui;
+namespace MastercardPaymentGatewayServices\Simplify\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\ConfigInterface;
-use MasterCard\SimplifyCommerce\Model\Config\Source\FormType;
+use MastercardPaymentGatewayServices\Simplify\Model\Config\Source\FormType;
 
 class ConfigProvider implements ConfigProviderInterface
 {

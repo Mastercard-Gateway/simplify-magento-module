@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Gateway\Response;
+namespace MastercardPaymentGatewayServices\Simplify\Gateway\Response;
 
 use DateInterval;
 use DateTime;
@@ -121,7 +121,7 @@ class TokenHandler implements HandlerInterface
      * @param string $brand
      * @return string
      */
-    private static function getCcTypeFromBrand($brand)
+    private function getCcTypeFromBrand($brand)
     {
         $brands = [
             'MASTERCARD' => 'MC',

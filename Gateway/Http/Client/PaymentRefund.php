@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MasterCard\SimplifyCommerce\Gateway\Http\Client;
+namespace MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client;
 
 class PaymentRefund extends AbstractTransaction
 {

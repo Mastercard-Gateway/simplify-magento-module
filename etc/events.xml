@@ -17,6 +17,6 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="payment_method_assign_data_simplifycommerce">
-        <observer name="simplifycommerce_gateway_data_assign" instance="MasterCard\SimplifyCommerce\Observer\DataAssignObserver" />
+        <observer name="simplifycommerce_gateway_data_assign" instance="MastercardPaymentGatewayServices\Simplify\Observer\DataAssignObserver" />
     </event>
 </config>
