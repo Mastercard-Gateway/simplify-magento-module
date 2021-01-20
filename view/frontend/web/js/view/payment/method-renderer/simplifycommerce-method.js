@@ -119,7 +119,7 @@ define([
          * Called by afterRender
          * @returns {exports}
          */
-        initializeSimplify: function (button) {
+        initializeSimplify: function () {
             requirejs.load({
                 contextName: '_',
                 onScriptLoad: function () {
@@ -130,7 +130,8 @@ define([
                             amount: this.totals().base_grand_total * 100,
                             currency: this.totals().quote_currency_code,
                             reference: quote.getQuoteId(),
-                            operation: 'create.token'
+                            operation: 'create.token',
+                            redirectUrl: this.getRedirectUrl()
                         }
                     ).closeOnCompletion();
                 }.bind(this)

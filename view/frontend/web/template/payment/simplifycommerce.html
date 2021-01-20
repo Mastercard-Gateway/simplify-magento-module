@@ -57,8 +57,12 @@
             </div>
             <!-- /ko -->
             <!-- ko ifnot: isModal() -->
-            <div class="payment-method-simplifycommerce">
-                <iframe name="simplifycommerce-form" data-bind='attr: {"data-sc-key": getPublicKey()}'></iframe>
+            <div class="payment-method-simplifycommerce" data-bind="afterRender: initializeSimplify">
+                <iframe name="my-hosted-form"
+                data-bind='attr: {"data-sc-key": getPublicKey()}, afterRender: initializeSimplify'
+                style="height: 400px; width: 100%"
+                data-color="#12B830">
+                </iframe>
             </div>
             <!--/ko-->
         </fieldset>

@@ -34,6 +34,7 @@
         <arguments>
             <argument name="methodCodes" xsi:type="array">
                 <item name="simplifycommerce" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::CODE</item>
+                <item name="simplifycommerce_embedded" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::EMBEDDED_CODE</item>
             </argument>
         </arguments>
     </type>

@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+define([
+    'MastercardPaymentGatewayServices_Simplify/js/view/payment/method-renderer/simplifycommerce-method'
+], function (
+    Component
+) {
+    'use strict';
 
-//
-//  Common
-//  _____________________________________________
-
-& when (@media-common = true) {
-  .payment-method-simplifycommerce {
-    iframe[name=simplifycommerce-form] {
-      width: 100%;
-      height: 414px;
-      overflow: hidden;
-      border: 0;
-    }
-  }
-    #simplify-checkout-frame {
-        border: none;
-        height: 375px; // Value may need adjusting per your requirement
-        overflow: hidden;
-    }
-}
+    return Component.extend({
+        /**
+         * Payment method code getter
+         * @returns {String}
+         */
+        getCode: function () {
+            return 'simplifycommerce_embedded';
+        },
+    });
+});
