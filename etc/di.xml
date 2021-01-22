@@ -31,8 +31,8 @@
             <argument name="code" xsi:type="const">MastercardPaymentGatewayServices\Simplify\Ui\ConfigProvider::EMBEDDED_CODE</argument>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form\Cc</argument>
             <argument name="infoBlockType" xsi:type="string">MastercardPaymentGatewayServices\SimplifyEmbedded\Block\Info</argument>
-            <argument name="valueHandlerPool" xsi:type="object">SimplifyValueHandlerPool</argument>
-            <argument name="validatorPool" xsi:type="object">SimplifyValidatorPool</argument>
+            <argument name="valueHandlerPool" xsi:type="object">SimplifyEmbeddedValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">SimplifyEmbeddedValidatorPool</argument>
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
         </arguments>
     </virtualType>
@@ -233,6 +233,18 @@
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
     </virtualType>
+    <virtualType name="SimplifyEmbeddedValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">SimplifyEmbeddedCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">SimplifyEmbeddedConfig</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="SimplifyValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -243,6 +255,18 @@
     <virtualType name="SimplifyDefaultValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
             <argument name="configInterface" xsi:type="object">SimplifyConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">SimplifyEmbeddedDefaultValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedDefaultValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">SimplifyEmbeddedConfig</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyConfig" type="Magento\Payment\Gateway\Config\Config">
@@ -303,6 +327,11 @@
     <virtualType name="SimplifyVaultPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
         <arguments>
             <argument name="configInterface" xsi:type="object">SimplifyVaultPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedPaymentValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">SimplifyEmbeddedConfig</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVaultPaymentValueHandlerPool" type="VaultPaymentValueHandlerPool">
