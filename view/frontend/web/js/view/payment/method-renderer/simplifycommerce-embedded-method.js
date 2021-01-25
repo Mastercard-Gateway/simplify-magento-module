@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 define([
+    'jquery',
+    'Magento_Checkout/js/action/set-payment-information',
     'MastercardPaymentGatewayServices_Simplify/js/view/payment/method-renderer/simplifycommerce-method'
 ], function (
+    $,
+    setPaymentInformationAction,
     Component
 ) {
     'use strict';
@@ -28,5 +32,27 @@ define([
         getCode: function () {
             return 'simplifycommerce_embedded';
         },
+
+        /**
+         * @param data
+         */
+        paymentCallback: function (data) {
+            this.responseData = JSON.stringify(data);
+            if (data.close && data.close === true) {
+                fullScreenLoader.stopLoader();
+                this.isPlaceOrderActionAllowed(true);
+                return;
+            }
+
+            if (this.getCode() !== 'simplifycommerce_embedded') {
+                return;
+            }
+
+            $.when(
+                setPaymentInformationAction(this.messageContainer, this.getData())
+            ).done(function () {
+                window.location.href = this.getRedirectUrl() + '?cardToken=' + data.cardToken;
+            }.bind(this));
+        }
     });
 });

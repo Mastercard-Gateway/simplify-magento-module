@@ -131,7 +131,7 @@ define([
                             currency: this.totals().quote_currency_code,
                             reference: quote.getQuoteId(),
                             operation: 'create.token',
-                            redirectUrl: this.getRedirectUrl()
+                            selector: '[data-role=' + this.getCode() + '_pay]',
                         }
                     ).closeOnCompletion();
                 }.bind(this)
@@ -146,9 +146,7 @@ define([
             if (data.close && data.close === true) {
                 fullScreenLoader.stopLoader();
                 this.isPlaceOrderActionAllowed(true);
-                return;
             }
-            this.placeOrder();
         },
 
         /**
