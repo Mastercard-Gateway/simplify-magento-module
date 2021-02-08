@@ -111,7 +111,7 @@ define([
                 fullScreenLoader.stopLoader();
             }.bind(this), 1000);
 
-            let button = $('button[data-role=' + this.getCode() + '_pay]');
+            var button = $('button[data-role=' + this.getCode() + '_pay]');
             button.trigger('click');
         },
 
@@ -119,7 +119,7 @@ define([
          * Called by afterRender
          * @returns {exports}
          */
-        initializeSimplify: function (button) {
+        initializeSimplify: function () {
             requirejs.load({
                 contextName: '_',
                 onScriptLoad: function () {
@@ -130,7 +130,8 @@ define([
                             amount: this.totals().base_grand_total * 100,
                             currency: this.totals().quote_currency_code,
                             reference: quote.getQuoteId(),
-                            operation: 'create.token'
+                            operation: 'create.token',
+                            selector: '[data-role=' + this.getCode() + '_pay]',
                         }
                     ).closeOnCompletion();
                 }.bind(this)
@@ -145,16 +146,14 @@ define([
             if (data.close && data.close === true) {
                 fullScreenLoader.stopLoader();
                 this.isPlaceOrderActionAllowed(true);
-                return;
             }
-            this.placeOrder();
         },
 
         /**
          * Get payment method data
          */
         getData: function () {
-            let data = this._super();
+            var data = this._super();
 
             if (!('additional_data' in data) || data['additional_data'] === null) {
                 data['additional_data'] = {};

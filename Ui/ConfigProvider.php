@@ -25,9 +25,11 @@ use MastercardPaymentGatewayServices\Simplify\Model\Config\Source\FormType;
 class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'simplifycommerce';
+    const EMBEDDED_CODE = 'simplifycommerce_embedded';
     const VAULT_CODE = 'simplifycommerce_vault';
 
     const PAYMENT_CODE = 'simplifycommerce';
+    const EMBEDDED_PAYMENT_CODE = 'simplifycommerce_embedded';
     const JS_COMPONENT = 'js_component_url';
     const PUBLIC_KEY = 'public_key';
     const IS_MODAL = 'is_modal';
@@ -43,18 +45,25 @@ class ConfigProvider implements ConfigProviderInterface
      * @var UrlInterface
      */
     protected $urlBuilder;
+    /**
+     * @var ConfigInterface
+     */
+    private $embeddedConfig;
 
     /**
      * ConfigProvider constructor.
      * @param ConfigInterface $config
      * @param UrlInterface $urlBuilder
+     * @param ConfigInterface $embeddedConfig
      */
     public function __construct(
         ConfigInterface $config,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        ConfigInterface $embeddedConfig
     ) {
         $this->config = $config;
         $this->urlBuilder = $urlBuilder;
+        $this->embeddedConfig = $embeddedConfig;
     }
 
     /**
@@ -80,6 +89,13 @@ class ConfigProvider implements ConfigProviderInterface
                     self::JS_COMPONENT => $this->config->getValue(self::JS_COMPONENT),
                     self::PUBLIC_KEY => $this->config->getValue(self::PUBLIC_KEY),
                     self::IS_MODAL => $this->config->getValue(self::PAYMENT_FORM_TYPE) == FormType::MODAL,
+                    self::REDIRECT_URL => $this->getPlaceOrderUrl(),
+                    'vault_code' => self::VAULT_CODE,
+                ],
+                self::EMBEDDED_PAYMENT_CODE => [
+                    self::JS_COMPONENT => $this->embeddedConfig->getValue(self::JS_COMPONENT),
+                    self::PUBLIC_KEY => $this->embeddedConfig->getValue(self::PUBLIC_KEY),
+                    self::IS_MODAL => $this->embeddedConfig->getValue(self::PAYMENT_FORM_TYPE) == FormType::MODAL,
                     self::REDIRECT_URL => $this->getPlaceOrderUrl(),
                     'vault_code' => self::VAULT_CODE,
                 ]
