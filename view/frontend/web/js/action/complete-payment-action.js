@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2013-2020 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 define([
-    'MastercardPaymentGatewayServices_Simplify/js/view/payment/method-renderer/simplifycommerce-method'
-], function (
-    Component
-) {
+    'jquery',
+    'Magento_Checkout/js/action/set-payment-information'
+], function ($, setPaymentInformationAction) {
     'use strict';
 
-    return Component.extend({
-        /**
-         * Payment method code getter
-         * @returns {String}
-         */
-        getCode: function () {
-            return 'simplifycommerce_embedded';
-        },
-    });
+    var inProcess = false;
+
+    return function (messageContainer, paymentData, redirectUrl) {
+
+        if (inProcess) {
+            return false;
+        }
+
+        inProcess = true;
+        return $.when(
+            setPaymentInformationAction(messageContainer, paymentData)
+        ).done(function () {
+            window.location.href = redirectUrl;
+        }).always(function () {
+            inProcess = false;
+        });
+    };
 });

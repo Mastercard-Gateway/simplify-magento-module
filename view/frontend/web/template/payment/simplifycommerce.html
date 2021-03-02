@@ -74,7 +74,7 @@
         <!-- ko if: isModal() -->
         <div class="actions-toolbar">
             <div class="primary">
-                <button type="button" data-bind='visible: false, attr: {"data-sc-key": getPublicKey(), "data-redirect-url": getRedirectUrl(), "data-role": getCode() + "_pay"}'>
+                <button type="button" data-bind='visible: false, attr: {"data-sc-key": getPublicKey(), "data-role": getCode() + "_pay"}'>
                     <span data-bind="i18n: 'Pay', afterRender: initializeSimplify"></span>
                 </button>
                 <button class="action primary checkout"
