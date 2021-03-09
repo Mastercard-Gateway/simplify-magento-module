@@ -86,6 +86,11 @@ class PlaceOrder extends Action
     protected $storeManager;
 
     /**
+     * @var ConfigInterface
+     */
+    private $embeddedConfig;
+
+    /**
      * Redirect constructor.
      * @param Context $context
      * @param ConfigInterface $config
@@ -100,6 +105,7 @@ class PlaceOrder extends Action
     public function __construct(
         Context $context,
         ConfigInterface $config,
+        ConfigInterface $embeddedConfig,
         CheckoutSession $checkoutSession,
         LoggerInterface $logger,
         CartManagementInterface $cartManagement,
@@ -110,6 +116,7 @@ class PlaceOrder extends Action
     ) {
         parent::__construct($context);
         $this->config = $config;
+        $this->embeddedConfig = $embeddedConfig;
         $this->checkoutSession = $checkoutSession;
         $this->logger = $logger;
         $this->cartManagement = $cartManagement;
@@ -124,7 +131,7 @@ class PlaceOrder extends Action
      */
     public function dispatch(RequestInterface $request)
     {
-        if (!$this->config->getValue('active')) {
+        if (!$this->config->getValue('active') && !$this->embeddedConfig->getValue('active')) {
             $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, '1');
 
             /** @var Redirect $resultRedirect */

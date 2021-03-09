@@ -48,6 +48,7 @@
     <type name="MastercardPaymentGatewayServices\Simplify\Controller\Simplify\PlaceOrder">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
+            <argument name="embeddedConfig" xsi:type="object">SimplifyEmbeddedConfig</argument>
         </arguments>
     </type>
 </config>

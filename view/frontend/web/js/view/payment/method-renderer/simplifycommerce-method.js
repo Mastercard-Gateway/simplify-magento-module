@@ -25,7 +25,8 @@ define([
     'Magento_Checkout/js/model/place-order',
     'Magento_Customer/js/customer-data',
     'Magento_Vault/js/view/payment/vault-enabler',
-    'Magento_Checkout/js/action/set-payment-information'
+    'Magento_Checkout/js/action/set-payment-information',
+    'MastercardPaymentGatewayServices_Simplify/js/action/complete-payment-action'
 ], function (
     $,
     Component,
@@ -38,7 +39,8 @@ define([
     placeOrderService,
     customerData,
     VaultEnabler,
-    setPaymentInformationAction
+    setPaymentInformationAction,
+    completePaymentAction
 ) {
     'use strict';
 
@@ -146,7 +148,14 @@ define([
             if (data.close && data.close === true) {
                 fullScreenLoader.stopLoader();
                 this.isPlaceOrderActionAllowed(true);
+                return;
             }
+
+            completePaymentAction(
+                this.messageContainer,
+                this.getData(),
+                this.getRedirectUrl() + '?cardToken=' + data.cardToken
+            );
         },
 
         /**
