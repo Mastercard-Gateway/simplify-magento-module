@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Http\Client;
+namespace MasterCard\SimplifyCommerce\Gateway\Http\Client;
 
 class PaymentVoid extends AbstractTransaction
 {

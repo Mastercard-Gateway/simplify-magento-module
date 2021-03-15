@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Request;
+namespace MasterCard\SimplifyCommerce\Gateway\Request;
 
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;

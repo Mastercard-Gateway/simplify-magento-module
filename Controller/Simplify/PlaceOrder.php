@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Controller\Simplify;
+namespace MasterCard\SimplifyCommerce\Controller\Simplify;
 
 use Exception;
 use InvalidArgumentException;
@@ -29,6 +29,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
 use Magento\Framework\Stdlib\CookieManagerInterface;
 use Magento\Payment\Gateway\ConfigInterface;
@@ -36,7 +37,6 @@ use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Zend_Json_Encoder;
 
 class PlaceOrder extends Action
 {
@@ -91,9 +91,15 @@ class PlaceOrder extends Action
     private $embeddedConfig;
 
     /**
+     * @var Json
+     */
+    private $json;
+
+    /**
      * Redirect constructor.
      * @param Context $context
      * @param ConfigInterface $config
+     * @param ConfigInterface $embeddedConfig
      * @param CheckoutSession $checkoutSession
      * @param LoggerInterface $logger
      * @param CartManagementInterface $cartManagement
@@ -101,6 +107,7 @@ class PlaceOrder extends Action
      * @param CookieManagerInterface $cookieManager
      * @param CookieMetadataFactory $cookieMetadataFactory
      * @param StoreManagerInterface $storeManager
+     * @param Json $json
      */
     public function __construct(
         Context $context,
@@ -112,7 +119,8 @@ class PlaceOrder extends Action
         CustomerSession $customerSession,
         CookieManagerInterface $cookieManager,
         CookieMetadataFactory $cookieMetadataFactory,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Json $json
     ) {
         parent::__construct($context);
         $this->config = $config;
@@ -124,6 +132,7 @@ class PlaceOrder extends Action
         $this->cookieManager = $cookieManager;
         $this->cookieMetadataFactory = $cookieMetadataFactory;
         $this->storeManager = $storeManager;
+        $this->json = $json;
     }
 
     /**
@@ -195,7 +204,7 @@ class PlaceOrder extends Action
 
             $this->validateQuote($quote);
 
-            $quote->getPayment()->setAdditionalInformation('response', Zend_Json_Encoder::encode([
+            $quote->getPayment()->setAdditionalInformation('response', $this->json->serialize([
                 'cardToken' => $this->getRequest()->getParam('cardToken')
             ]));
 

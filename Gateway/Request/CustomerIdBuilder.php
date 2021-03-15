@@ -15,25 +15,38 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Request;
+namespace MasterCard\SimplifyCommerce\Gateway\Request;
 
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Zend_Json_Decoder;
 
 class CustomerIdBuilder implements BuilderInterface
 {
     /**
+     * @var Json
+     */
+    private $json;
+
+    /**
+     * CustomerIdBuilder constructor.
+     * @param Json $json
+     */
+    public function __construct(
+        Json $json
+    ) {
+        $this->json = $json;
+    }
+    /**
      * @param array $buildSubject
      * @return array
-     * @throws \Zend_Json_Exception
      */
     public function build(array $buildSubject)
     {
         $paymentDO = SubjectReader::readPayment($buildSubject);
         $payment = $paymentDO->getPayment();
 
-        $simplifyDO = Zend_Json_Decoder::decode(
+        $simplifyDO = $this->json->unserialize(
             $payment->getAdditionalInformation('customer')
         );
 

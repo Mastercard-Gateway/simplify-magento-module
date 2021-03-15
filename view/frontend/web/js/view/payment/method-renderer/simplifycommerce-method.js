@@ -26,7 +26,7 @@ define([
     'Magento_Customer/js/customer-data',
     'Magento_Vault/js/view/payment/vault-enabler',
     'Magento_Checkout/js/action/set-payment-information',
-    'MastercardPaymentGatewayServices_Simplify/js/action/complete-payment-action'
+    'MasterCard_SimplifyCommerce/js/action/complete-payment-action'
 ], function (
     $,
     Component,
@@ -46,7 +46,7 @@ define([
 
     return Component.extend({
         defaults: {
-            template: 'MastercardPaymentGatewayServices_Simplify/payment/simplifycommerce'
+            template: 'MasterCard_SimplifyCommerce/payment/simplifycommerce'
         },
         totals: quote.getTotals(),
         responseData: null,

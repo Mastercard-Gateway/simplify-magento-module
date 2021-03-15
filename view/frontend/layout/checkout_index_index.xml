@@ -34,7 +34,7 @@
                                                             <!-- Custom payment method component renders here -->
                                                             <item name="children" xsi:type="array">
                                                                 <item name="simplifycommerce" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">MastercardPaymentGatewayServices_Simplify/js/view/payment/simplifycommerce</item>
+                                                                    <item name="component" xsi:type="string">MasterCard_SimplifyCommerce/js/view/payment/simplifycommerce</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="simplifycommerce" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
@@ -42,7 +42,7 @@
                                                                     </item>
                                                                 </item>
                                                                 <item name="simplifycommerce_embedded" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">MastercardPaymentGatewayServices_Simplify/js/view/payment/simplifycommerce-embedded</item>
+                                                                    <item name="component" xsi:type="string">MasterCard_SimplifyCommerce/js/view/payment/simplifycommerce-embedded</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="simplifycommerce_embedded" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>

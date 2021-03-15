@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Command;
+namespace MasterCard\SimplifyCommerce\Gateway\Command;
 
 use Magento\Payment\Gateway\Command;
 use Magento\Payment\Gateway\Command\CommandException;

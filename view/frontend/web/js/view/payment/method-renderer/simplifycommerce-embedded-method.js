@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 define([
-    'MastercardPaymentGatewayServices_Simplify/js/view/payment/method-renderer/simplifycommerce-method'
+    'MasterCard_SimplifyCommerce/js/view/payment/method-renderer/simplifycommerce-method'
 ], function (
     Component
 ) {
