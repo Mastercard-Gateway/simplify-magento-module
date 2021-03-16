@@ -37,6 +37,7 @@ class CustomerHandler implements HandlerInterface
     ) {
         $this->json = $json;
     }
+
     /**
      * Handles response
      *

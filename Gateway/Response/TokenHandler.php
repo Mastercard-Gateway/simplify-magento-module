@@ -68,7 +68,6 @@ class TokenHandler implements HandlerInterface
      * @param array $handlingSubject
      * @param array $response
      * @return void
-     * @throws \Zend_Json_Exception
      */
     public function handle(array $handlingSubject, array $response)
     {
@@ -102,7 +101,6 @@ class TokenHandler implements HandlerInterface
     /**
      * @param InfoInterface $payment
      * @return mixed
-     * @throws \Zend_Json_Exception
      */
     private function getPaymentToken(InfoInterface $payment)
     {
