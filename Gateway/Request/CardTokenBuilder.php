@@ -29,7 +29,7 @@ class CardTokenBuilder implements BuilderInterface
     private $json;
 
     /**
-     * CustomerIdBuilder constructor.
+     * CardTokenBuilder constructor.
      * @param Json $json
      */
     public function __construct(
