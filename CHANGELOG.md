@@ -1,3 +1,9 @@
+## 3.0.4 (March 18, 2021)
+Adding Magento 2.4 Support
+Removed dependency from Zend_Json
+Fixed CardTokenBuilder constructor php doc
+Fixing crypt issue
+
 ## 3.0.3 (September 10, 2020)
 Changing terminology for payment actions to Authorization and Payment
 
