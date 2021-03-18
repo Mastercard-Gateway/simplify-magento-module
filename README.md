@@ -11,6 +11,7 @@ The module allows payments using Simplify Commerce Hosted Payments. Simplify Com
 This module is compatible with:
 - Magento 2.2
 - Magento 2.3
+- Magento 2.4
 
 Community and Commerce Edition are both supported.
  
