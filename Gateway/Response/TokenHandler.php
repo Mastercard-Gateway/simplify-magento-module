@@ -20,6 +20,7 @@ namespace MasterCard\SimplifyCommerce\Gateway\Response;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\InfoInterface;
@@ -27,8 +28,6 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Vault\Api\Data\PaymentTokenInterfaceFactory;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
-use Zend_Json_Decoder;
-use Zend_Json_Encoder;
 
 class TokenHandler implements HandlerInterface
 {
@@ -43,16 +42,24 @@ class TokenHandler implements HandlerInterface
     private $paymentExtensionFactory;
 
     /**
+     * @var Json
+     */
+    private $json;
+
+    /**
      * TokenHandler constructor.
      * @param PaymentTokenInterfaceFactory $paymentTokenFactory
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+     * @param Json $json
      */
     public function __construct(
         PaymentTokenInterfaceFactory $paymentTokenFactory,
-        OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
+        OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
+        Json $json
     ) {
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->paymentExtensionFactory = $paymentExtensionFactory;
+        $this->json = $json;
     }
 
     /**
@@ -61,7 +68,6 @@ class TokenHandler implements HandlerInterface
      * @param array $handlingSubject
      * @param array $response
      * @return void
-     * @throws \Zend_Json_Exception
      */
     public function handle(array $handlingSubject, array $response)
     {
@@ -95,15 +101,14 @@ class TokenHandler implements HandlerInterface
     /**
      * @param InfoInterface $payment
      * @return mixed
-     * @throws \Zend_Json_Exception
      */
     private function getPaymentToken(InfoInterface $payment)
     {
-        $customer = Zend_Json_Decoder::decode($payment->getAdditionalInformation('customer'));
+        $customer = $this->json->unserialize($payment->getAdditionalInformation('customer'));
 
         $token = $this->paymentTokenFactory->create();
         $token->setGatewayToken($customer['id']);
-        $token->setTokenDetails(Zend_Json_Encoder::encode([
+        $token->setTokenDetails($this->json->serialize([
             'type' => $this->getCcTypeFromBrand($customer['type']),
             'last4' => $customer['last4'],
             'expMonth' => $customer['expMonth'],
