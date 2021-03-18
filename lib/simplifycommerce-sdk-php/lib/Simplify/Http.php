@@ -279,7 +279,7 @@ class Simplify_HTTP
                           'kid' => $authentication->publicKey,
                           self::JWS_HDR_URI => $url,
                           self::JWS_HDR_TIMESTAMP => sprintf("%u000", round(microtime(true))),
-                          self::JWS_HDR_NONCE => sprintf("%u", mt_rand()),
+                          self::JWS_HDR_NONCE => sprintf("%u", random_int(PHP_INT_MIN, PHP_INT_MAX)),
     	);
 
         // add oauth token if provided
