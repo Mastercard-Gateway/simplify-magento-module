@@ -1,11 +1,20 @@
 stages:
   - test
+  - deploy
 
 variables:
   COMPOSER_MIRROR_PATH_REPOS: 1
   COMPOSER_ALLOW_SUPERUSER: 1
   COMPOSER_MEMORY_LIMIT: -1
   COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+
+deploy-to-uat:
+  stage: deploy
+  script:
+    - curl -v -X POST -F "token=$PIPELINE_TOKEN" -F ref=master -F "variables[EXTENSION]=$PLAYBOOK" "$TRIGGER_URL"
+  only:
+    refs:
+      - master
 
 sonarqube-check:
   stage: test
@@ -24,7 +33,6 @@ sonarqube-check:
   allow_failure: true
   only:
     - merge_requests
-    - master
 
 .magento:build: &magento-build
   before_script:
