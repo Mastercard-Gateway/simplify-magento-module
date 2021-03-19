@@ -15,14 +15,29 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Response;
+namespace MasterCard\SimplifyCommerce\Gateway\Response;
 
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
-use Zend_Json_Encoder;
 
 class CustomerHandler implements HandlerInterface
 {
+    /**
+     * @var Json
+     */
+    private $json;
+
+    /**
+     * CustomerHandler constructor.
+     * @param Json $json
+     */
+    public function __construct(
+        Json $json
+    ) {
+        $this->json = $json;
+    }
+
     /**
      * Handles response
      *
@@ -36,7 +51,7 @@ class CustomerHandler implements HandlerInterface
         $payment = $paymentDO->getPayment();
         $simplifyDO = $response['object'];
 
-        $customer = Zend_Json_Encoder::encode([
+        $customer = $this->json->serialize([
             'id' => $simplifyDO->id,
             'last4' => $simplifyDO->card->last4,
             'type' => $simplifyDO->card->type,

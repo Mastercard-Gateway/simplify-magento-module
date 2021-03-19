@@ -26,7 +26,7 @@ define(
         rendererList.push(
             {
                 type: 'simplifycommerce_embedded',
-                component: 'MastercardPaymentGatewayServices_Simplify/js/view/payment/method-renderer/simplifycommerce-embedded-method'
+                component: 'MasterCard_SimplifyCommerce/js/view/payment/method-renderer/simplifycommerce-embedded-method'
             }
         );
         /** Add view logic here if needed */

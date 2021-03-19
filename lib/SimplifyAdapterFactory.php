@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\lib;
+namespace MasterCard\SimplifyCommerce\lib;
 
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Payment\Gateway\ConfigInterface;

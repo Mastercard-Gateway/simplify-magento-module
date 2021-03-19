@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace MastercardPaymentGatewayServices\Simplify\Model\Config\Source\Order\Status;
+namespace MasterCard\SimplifyCommerce\Model\Config\Source\Order\Status;
 
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Config\Source\Order\Status;

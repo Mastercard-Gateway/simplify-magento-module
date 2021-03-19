@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Ui;
+namespace MasterCard\SimplifyCommerce\Ui;
 
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Model\Ui\TokenUiComponentProviderInterface;
@@ -59,7 +59,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
                     TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
                     TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
                 ],
-                'name' => 'MastercardPaymentGatewayServices_Simplify/js/view/payment/method-renderer/vault'
+                'name' => 'MasterCard_SimplifyCommerce/js/view/payment/method-renderer/vault'
             ]
         );
 

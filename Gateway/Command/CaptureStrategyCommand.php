@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Command;
+namespace MasterCard\SimplifyCommerce\Gateway\Command;
 
+use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Data\OrderAdapterInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Helper\ContextHelper;
@@ -30,8 +31,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
-use MastercardPaymentGatewayServices\Simplify\lib\SimplifyAdapterFactory;
-use Zend_Json_Decoder;
+use MasterCard\SimplifyCommerce\lib\SimplifyAdapterFactory;
 
 class CaptureStrategyCommand implements CommandInterface
 {
@@ -67,25 +67,33 @@ class CaptureStrategyCommand implements CommandInterface
     private $simplifyAdapterFactory;
 
     /**
+     * @var Json
+     */
+    private $json;
+
+    /**
      * CaptureStrategyCommand constructor.
      * @param CommandPoolInterface $commandPool
      * @param FilterBuilder $filterBuilder
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param TransactionRepositoryInterface $transactionRepository
      * @param SimplifyAdapterFactory $simplifyAdapterFactory
+     * @param Json $json
      */
     public function __construct(
         CommandPoolInterface $commandPool,
         FilterBuilder $filterBuilder,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         TransactionRepositoryInterface $transactionRepository,
-        SimplifyAdapterFactory $simplifyAdapterFactory
+        SimplifyAdapterFactory $simplifyAdapterFactory,
+        Json $json
     ) {
         $this->commandPool = $commandPool;
         $this->filterBuilder = $filterBuilder;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->transactionRepository = $transactionRepository;
         $this->simplifyAdapterFactory = $simplifyAdapterFactory;
+        $this->json = $json;
     }
 
     /**
@@ -130,7 +138,7 @@ class CaptureStrategyCommand implements CommandInterface
         if (!$payment->getAuthorizationTransaction() && !$existsCapture) {
             $customer = $payment->getAdditionalInformation('customer');
             if ($customer) {
-                $customer = Zend_Json_Decoder::decode($customer);
+                $customer = $this->json->unserialize($customer);
                 if (isset($customer['id']) && $customer['id']) {
                     return self::CUSTOMER_SALE;
                 }

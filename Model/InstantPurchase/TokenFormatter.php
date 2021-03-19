@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace MastercardPaymentGatewayServices\Simplify\Model\InstantPurchase;
+namespace MasterCard\SimplifyCommerce\Model\InstantPurchase;
 
 use Magento\InstantPurchase\PaymentMethodIntegration\PaymentTokenFormatterInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;

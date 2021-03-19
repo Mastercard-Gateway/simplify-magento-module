@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace MastercardPaymentGatewayServices\Simplify\Gateway\Http;
+namespace MasterCard\SimplifyCommerce\Gateway\Http;
 
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
