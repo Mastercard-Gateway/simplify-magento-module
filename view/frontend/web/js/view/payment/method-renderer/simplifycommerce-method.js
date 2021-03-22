@@ -25,7 +25,8 @@ define([
     'Magento_Checkout/js/model/place-order',
     'Magento_Customer/js/customer-data',
     'Magento_Vault/js/view/payment/vault-enabler',
-    'Magento_Checkout/js/action/set-payment-information'
+    'Magento_Checkout/js/action/set-payment-information',
+    'MasterCard_SimplifyCommerce/js/action/complete-payment-action'
 ], function (
     $,
     Component,
@@ -38,7 +39,8 @@ define([
     placeOrderService,
     customerData,
     VaultEnabler,
-    setPaymentInformationAction
+    setPaymentInformationAction,
+    completePaymentAction
 ) {
     'use strict';
 
@@ -111,7 +113,7 @@ define([
                 fullScreenLoader.stopLoader();
             }.bind(this), 1000);
 
-            let button = $('button[data-role=' + this.getCode() + '_pay]');
+            var button = $('button[data-role=' + this.getCode() + '_pay]');
             button.trigger('click');
         },
 
@@ -119,7 +121,7 @@ define([
          * Called by afterRender
          * @returns {exports}
          */
-        initializeSimplify: function (button) {
+        initializeSimplify: function () {
             requirejs.load({
                 contextName: '_',
                 onScriptLoad: function () {
@@ -130,7 +132,8 @@ define([
                             amount: this.totals().base_grand_total * 100,
                             currency: this.totals().quote_currency_code,
                             reference: quote.getQuoteId(),
-                            operation: 'create.token'
+                            operation: 'create.token',
+                            selector: '[data-role=' + this.getCode() + '_pay]',
                         }
                     ).closeOnCompletion();
                 }.bind(this)
@@ -147,14 +150,19 @@ define([
                 this.isPlaceOrderActionAllowed(true);
                 return;
             }
-            this.placeOrder();
+
+            completePaymentAction(
+                this.messageContainer,
+                this.getData(),
+                this.getRedirectUrl() + '?cardToken=' + data.cardToken
+            );
         },
 
         /**
          * Get payment method data
          */
         getData: function () {
-            let data = this._super();
+            var data = this._super();
 
             if (!('additional_data' in data) || data['additional_data'] === null) {
                 data['additional_data'] = {};

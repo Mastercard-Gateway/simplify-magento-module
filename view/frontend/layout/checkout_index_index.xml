@@ -41,6 +41,14 @@
                                                                         </item>
                                                                     </item>
                                                                 </item>
+                                                                <item name="simplifycommerce_embedded" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">MasterCard_SimplifyCommerce/js/view/payment/simplifycommerce-embedded</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="simplifycommerce_embedded" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
                                                             </item>
                                                         </item>
                                                     </item>

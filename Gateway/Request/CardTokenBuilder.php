@@ -37,7 +37,6 @@ class CardTokenBuilder implements BuilderInterface
     ) {
         $this->json = $json;
     }
-
     /**
      * @param array $buildSubject
      * @return array

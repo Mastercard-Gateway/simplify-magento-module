@@ -1,4 +1,3 @@
-<?php
 /**
  * Copyright (c) 2013-2020 Mastercard
  *
@@ -14,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/** @var \Magento\Framework\View\Element\Template $block */
-?>
-<script>
-    require([
-        'jquery',
-        'underscore',
-        'Magento_Checkout/js/empty-cart'
-    ], function ($, _, emptyCart) {
-        if (!_.isEmpty(String($.cookieStorage.get('simplify_section_data_clean')))) {
-            emptyCart();
-            $.cookieStorage.set('simplify_section_data_clean', '');
+define([
+    'jquery',
+    'Magento_Checkout/js/action/set-payment-information'
+], function ($, setPaymentInformationAction) {
+    'use strict';
+
+    var inProcess = false;
+
+    return function (messageContainer, paymentData, redirectUrl) {
+
+        if (inProcess) {
+            return false;
         }
-    });
-</script>
+
+        inProcess = true;
+        return $.when(
+            setPaymentInformationAction(messageContainer, paymentData)
+        ).done(function () {
+            window.location.href = redirectUrl;
+        }).always(function () {
+            inProcess = false;
+        });
+    };
+});

@@ -86,6 +86,11 @@ class PlaceOrder extends Action
     protected $storeManager;
 
     /**
+     * @var ConfigInterface
+     */
+    private $embeddedConfig;
+
+    /**
      * @var Json
      */
     private $json;
@@ -94,6 +99,7 @@ class PlaceOrder extends Action
      * Redirect constructor.
      * @param Context $context
      * @param ConfigInterface $config
+     * @param ConfigInterface $embeddedConfig
      * @param CheckoutSession $checkoutSession
      * @param LoggerInterface $logger
      * @param CartManagementInterface $cartManagement
@@ -101,10 +107,12 @@ class PlaceOrder extends Action
      * @param CookieManagerInterface $cookieManager
      * @param CookieMetadataFactory $cookieMetadataFactory
      * @param StoreManagerInterface $storeManager
+     * @param Json $json
      */
     public function __construct(
         Context $context,
         ConfigInterface $config,
+        ConfigInterface $embeddedConfig,
         CheckoutSession $checkoutSession,
         LoggerInterface $logger,
         CartManagementInterface $cartManagement,
@@ -116,6 +124,7 @@ class PlaceOrder extends Action
     ) {
         parent::__construct($context);
         $this->config = $config;
+        $this->embeddedConfig = $embeddedConfig;
         $this->checkoutSession = $checkoutSession;
         $this->logger = $logger;
         $this->cartManagement = $cartManagement;
@@ -131,13 +140,13 @@ class PlaceOrder extends Action
      */
     public function dispatch(RequestInterface $request)
     {
-        if (!$this->config->getValue('active')) {
-            $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, true);
+        if (!$this->config->getValue('active') && !$this->embeddedConfig->getValue('active')) {
+            $this->_actionFlag->set('', self::FLAG_NO_DISPATCH, '1');
 
             /** @var Redirect $resultRedirect */
             $resultRedirect = $this->resultRedirectFactory->create();
             $resultRedirect->setPath('noRoute');
-
+            //@phpstan-ignore-next-line
             return $resultRedirect;
         }
 
@@ -151,6 +160,7 @@ class PlaceOrder extends Action
      */
     protected function validateQuote($quote)
     {
+        /** @var CartInterface|false $quote */
         if (!$quote || !$quote->getItemsCount()) {
             throw new InvalidArgumentException(__('We can\'t initialize checkout.'));
         }
