@@ -111,7 +111,7 @@ define([
                 fullScreenLoader.stopLoader();
             }.bind(this), 1000);
 
-            let button = $('button[data-role=' + this.getCode() + '_pay]');
+            var button = $('button[data-role=' + this.getCode() + '_pay]');
             button.trigger('click');
         },
 
@@ -121,6 +121,7 @@ define([
          */
         initializeSimplify: function (button) {
             requirejs.load({
+                config: {},
                 contextName: '_',
                 onScriptLoad: function () {
                     SimplifyCommerce.hostedPayments(
@@ -154,7 +155,7 @@ define([
          * Get payment method data
          */
         getData: function () {
-            let data = this._super();
+            var data = this._super();
 
             if (!('additional_data' in data) || data['additional_data'] === null) {
                 data['additional_data'] = {};
