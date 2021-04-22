@@ -35,7 +35,7 @@ class PaymentValidator extends AbstractValidator
         $simplifyPayment = $response['object'];
 
         $paymentDO = SubjectReader::readPayment($validationSubject);
-        $amount = (int) ((float) SubjectReader::readAmount($validationSubject) * 100);
+        $amount = (int) round((float) SubjectReader::readAmount($validationSubject) * 100);
 
         $order = $paymentDO->getOrder();
 
