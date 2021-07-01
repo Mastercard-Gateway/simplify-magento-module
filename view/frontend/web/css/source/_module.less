@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@
 //  _____________________________________________
 
 & when (@media-common = true) {
-  .payment-method-simplifycommerce {
-    iframe[name=simplifycommerce-form] {
-      width: 100%;
-      height: 414px;
-      overflow: hidden;
-      border: 0;
+    .payment-method-simplifycommerce {
+        iframe[name="simplifycommerce-embedded-form"] {
+            width: 100%;
+            max-width: 500px;
+            height: 450px;
+            border: none;
+            margin: -30px -5px;
+        }
     }
-  }
+
     #simplify-checkout-frame {
         border: none;
-        height: 375px; // Value may need adjusting per your requirement
+        height: 375px;
         overflow: hidden;
     }
 }
