@@ -59,7 +59,8 @@
             <!-- ko ifnot: isModal() -->
             <div class="payment-method-simplifycommerce">
                 <iframe name="simplifycommerce-embedded-form"
-                        data-bind='attr: {"data-sc-key": getPublicKey(), "data-role": getCode() + "_pay"}, afterRender: initializeSimplify'
+                        title="Simplify Commerce Payment Form"
+                        data-bind='attr: {"data-sc-key": getPublicKey(), "data-role": getCode() + "_pay", "title": $t("Simplify Commerce Payment Form")}, afterRender: initializeSimplify'
                         data-color="#12B830"></iframe>
             </div>
             <!--/ko-->
@@ -76,8 +77,9 @@
                     <span data-bind="i18n: 'Pay', afterRender: initializeSimplify"></span>
                 </button>
                 <button class="action primary checkout"
+                        title="Pay"
                         type="button"
-                        data-bind='click: savePayment, enable: (getCode() == isChecked()), css: {disabled: !isPlaceOrderActionAllowed()}'
+                        data-bind='attr: {"title": $t("Pay")}, click: savePayment, enable: (getCode() == isChecked()), css: {disabled: !isPlaceOrderActionAllowed()}'
                         disabled>
                     <span data-bind="i18n: 'Pay'"></span>
                 </button>

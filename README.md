@@ -87,7 +87,7 @@ Please follow these steps to configure the module:
 
 1. Login to Magento Admin dashboard 
 2. Go to *Stores* > *Configuration* > *Sales* > *Payment Methods*
-3. Expand *OTHER PAYMENT METHODS*, then *Simplify Commerce by MasterCard*
+3. Expand *OTHER PAYMENT METHODS*, then *Mastercard Payment Gateway Services - Simplify*
 4. Fill in configuration details as described below
 5. Click Save Config to store the configuration.
 6. Follow Magento instructions and clean application cache, to make sure that the new payment method is immediately available in your online store.  
