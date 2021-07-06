@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright (c) 2013-2020 Mastercard
+  ~ Copyright (c) 2013-2021 Mastercard
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -52,7 +52,6 @@
                 <active>0</active>
                 <model>SimplifyEmbeddedFacade</model>
                 <payment_action>authorize_capture</payment_action>
-                <payment_action>authorize_capture</payment_action>
                 <title>Pay with Embedded Form</title>
                 <order_status>processing</order_status>
                 <public_key />
@@ -84,6 +83,15 @@
                     <additionalInformation>MasterCard\SimplifyCommerce\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
                 </instant_purchase>
             </simplifycommerce_vault>
+            <simplifycommerce_embedded_vault>
+                <model>SimplifyEmbeddedVaultFacade</model>
+                <title>Stored Cards (SimplifyCommerce)</title>
+                <instant_purchase>
+                    <available>MasterCard\SimplifyCommerce\Model\InstantPurchase\AvailabilityChecker</available>
+                    <tokenFormat>MasterCard\SimplifyCommerce\Model\InstantPurchase\TokenFormatter</tokenFormat>
+                    <additionalInformation>MasterCard\SimplifyCommerce\Model\InstantPurchase\PaymentAdditionalInformationProvider</additionalInformation>
+                </instant_purchase>
+            </simplifycommerce_embedded_vault>
         </payment>
     </default>
 </config>

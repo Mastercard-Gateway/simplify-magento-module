@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,10 @@ define([
          * @param data
          */
         paymentCallback: function (data) {
+            if (this.isChecked() !== this.getCode()) {
+                return;
+            }
+
             this.responseData = JSON.stringify(data);
             if (data.close && data.close === true) {
                 fullScreenLoader.stopLoader();
