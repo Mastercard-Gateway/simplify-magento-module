@@ -1,36 +1,62 @@
-## 3.0.4 (March 18, 2021)
-Adding Magento 2.4 Support
-Removed dependency from Zend_Json
-Fixed CardTokenBuilder constructor php doc
-Fixing crypt issue
+# Changelog
+All notable changes to this project will be documented in this file.
 
-## 3.0.3 (September 10, 2020)
-Changing terminology for payment actions to Authorization and Payment
 
-Fix the loading with production mode
+## [3.1.0] - 2021-10-19
+### Changed
+- Add Embedded Payment Option
+- Add configs for automated testing
+- Add compatibility with Magento 2.4
+- Branding Update
 
-## 3.0.2 (June 2, 2020)
-This release has multiple bugfixes and adds some optimizations.
+### Fixed
+- Simplify JS is not included into csp_whitelist.xml file
+- Shopping Cart is not emptied correctly after order is successfully created
+- JS is broken after bundling
 
-Optimizations:
 
-JS component loading in checkout
+## [3.0.4] - 2021-03-18
+### Changed
+- Adding Magento 2.4 Support
+- Removed dependency from Zend_Json
 
-Composer metadata
+### Fixed
+- Fixed CardTokenBuilder constructor php doc
+- Fixing crypt issue
 
-Fixes:
 
-PHP autoloader issue when package not installed via composer (classmap missing)
+## [3.0.3] - 2020-09-10
+### Changed
+- Changing terminology for payment actions to Authorization and Payment
 
-Private content not correctly invalidated when checkout success page is requested
+### Fixed
+- Fix the loading with production mode
 
-## 3.0.1 (November 6, 2019)
-Fixing broken links in the plugin
 
-## 3.0.0 (September 10, 2019)
-This release makes the module compatible with Magento 2.2 and 2.3, we also added tokenization (Vault) support.
+## [3.0.2] - 2020-06-02
+### Changed
+- Optimized JS component loading in checkout
+- Composer metadata updates
 
-## 2.1.6 (February 23, 2017)
-Initial release of Simplify Commerce payment gateway for Magento 2
+### Fixed
+- PHP autoloader issue when package not installed via composer (classmap missing)
+- Private content not correctly invalidated when checkout success page is requested
+
+
+## [3.0.1] - 2019-11-06
+### Fixed
+- Fixing broken links in the plugin
+
+
+## [3.0.0] - 2019-09-10
+### Changed
+- This release makes the module compatible with Magento 2.2 and 2.3, we also added tokenization (Vault) support.
+### Fixed
+
+
+## [2.1.6] - 2017-02-23
+### Changed
+- Initial release of Simplify Commerce payment gateway for Magento 2
+
 
 
