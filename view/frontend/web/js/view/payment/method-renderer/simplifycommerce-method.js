@@ -123,6 +123,7 @@ define([
          */
         initializeSimplify: function () {
             requirejs.load({
+                config: {},
                 contextName: '_',
                 onScriptLoad: function () {
                     SimplifyCommerce.hostedPayments(
