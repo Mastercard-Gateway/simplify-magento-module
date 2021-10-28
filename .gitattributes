@@ -3,3 +3,4 @@
 .gitlab-ci.yml export-ignore
 Makefile export-ignore
 sonar-project.properties export-ignore
+* -crlf
