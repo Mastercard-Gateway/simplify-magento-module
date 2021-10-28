@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,14 @@ namespace MasterCard\SimplifyCommerce\Gateway\Response;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Exception;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterfaceFactory;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
 
@@ -47,7 +49,6 @@ class TokenHandler implements HandlerInterface
     private $json;
 
     /**
-     * TokenHandler constructor.
      * @param PaymentTokenInterfaceFactory $paymentTokenFactory
      * @param OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory
      * @param Json $json
@@ -67,7 +68,10 @@ class TokenHandler implements HandlerInterface
      *
      * @param array $handlingSubject
      * @param array $response
+     *
      * @return void
+     *
+     * @throws Exception
      */
     public function handle(array $handlingSubject, array $response)
     {
@@ -85,6 +89,7 @@ class TokenHandler implements HandlerInterface
 
     /**
      * Get payment extension attributes
+     *
      * @param InfoInterface $payment
      * @return OrderPaymentExtensionInterface
      */
@@ -100,7 +105,9 @@ class TokenHandler implements HandlerInterface
 
     /**
      * @param InfoInterface $payment
-     * @return mixed
+     *
+     * @return PaymentTokenInterface
+     * @throws Exception
      */
     private function getPaymentToken(InfoInterface $payment)
     {
@@ -137,14 +144,16 @@ class TokenHandler implements HandlerInterface
             'JCB' => 'JCB',
             'MAESTRO' => 'SM',
         ];
-        return isset($brands[$brand]) ? $brands[$brand] : $brand;
+        return $brands[$brand] ?? $brand;
     }
 
     /**
      * @param string $exprMonth
      * @param string $exprYear
+     *
      * @return string
-     * @throws \Exception
+     *
+     * @throws Exception
      */
     private function getExpirationDate($exprMonth, $exprYear)
     {
