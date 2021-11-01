@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,9 @@ class CustomerIdBuilder implements BuilderInterface
     private $json;
 
     /**
-     * CustomerIdBuilder constructor.
      * @param Json $json
      */
-    public function __construct(
-        Json $json
-    ) {
+    public function __construct(Json $json) {
         $this->json = $json;
     }
 

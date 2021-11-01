@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ abstract class AbstractTransaction implements ClientInterface
     protected $adapterFactory;
 
     /**
-     * AbstractTransaction constructor.
      * @param Logger $logger
      * @param SimplifyAdapterFactory $adapterFactory
      */
@@ -51,7 +50,7 @@ abstract class AbstractTransaction implements ClientInterface
     /**
      * Places request to gateway. Returns result as ENV array
      *
-     * @param \Magento\Payment\Gateway\Http\TransferInterface $transferObject
+     * @param TransferInterface $transferObject
      * @return array
      * @throws ClientException
      */
