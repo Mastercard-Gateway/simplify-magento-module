@@ -33,7 +33,8 @@ class CustomerBuilder implements BuilderInterface
     /**
      * @param CustomerRepositoryInterface $customerRepository
      */
-    public function __construct(CustomerRepositoryInterface $customerRepository) {
+    public function __construct(CustomerRepositoryInterface $customerRepository)
+    {
         $this->customerRepository = $customerRepository;
     }
 

@@ -38,7 +38,8 @@ class AuthorizeStrategyCommand implements CommandInterface
     /**
      * @param CommandPoolInterface $commandPool
      */
-    public function __construct(CommandPoolInterface $commandPool) {
+    public function __construct(CommandPoolInterface $commandPool)
+    {
         $this->commandPool = $commandPool;
     }
 

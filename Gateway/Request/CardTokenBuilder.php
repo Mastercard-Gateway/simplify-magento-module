@@ -31,7 +31,8 @@ class CardTokenBuilder implements BuilderInterface
     /**
      * @param Json $json
      */
-    public function __construct(Json $json) {
+    public function __construct(Json $json)
+    {
         $this->json = $json;
     }
 
