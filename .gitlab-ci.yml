@@ -9,6 +9,7 @@ variables:
   COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
 
 deploy-to-uat:
+  image: gitlab.extensions.ontap.cloud:5050/mpgs/docker-ontap-php:7.4-2
   stage: deploy
   script:
     - curl -v -X POST -F "token=$PIPELINE_TOKEN" -F ref=master -F "variables[EXTENSION]=$PLAYBOOK" "$TRIGGER_URL"
