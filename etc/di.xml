@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-  ~ Copyright (c) 2013-2020 Mastercard
+  ~ Copyright (c) 2013-2021 Mastercard
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -26,6 +26,16 @@
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
         </arguments>
     </virtualType>
+    <virtualType name="SimplifyEmbeddedFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::EMBEDDED_CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form\Cc</argument>
+            <argument name="infoBlockType" xsi:type="string">MasterCard\SimplifyCommerceEmbedded\Block\Info</argument>
+            <argument name="valueHandlerPool" xsi:type="object">SimplifyEmbeddedValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">SimplifyEmbeddedValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">SimplifyEmbeddedCommandPool</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="SimplifyCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
             <argument name="commands" xsi:type="array">
@@ -41,7 +51,6 @@
                 <item name="refund" xsi:type="string">SimplifyRefundCommand</item>
                 <item name="vault_authorize" xsi:type="string">SimplifyVaultAuthorizeCommand</item>
                 <item name="vault_sale" xsi:type="string">SimplifyVaultSaleCommand</item>
-<!--                <item name="vault_capture" xsi:type="string">Not implemented</item>-->
             </argument>
         </arguments>
     </virtualType>
@@ -50,6 +59,11 @@
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
     </type>
+    <virtualType name="MasterCard\SimplifyCommerceEmbedded\Block\Info" type="MasterCard\SimplifyCommerce\Block\Info">
+        <arguments>
+            <argument name="config" xsi:type="object">SimplifyEmbeddedConfig</argument>
+        </arguments>
+    </virtualType>
     <type name="MasterCard\SimplifyCommerce\Gateway\Command\CaptureStrategyCommand">
         <arguments>
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
@@ -218,6 +232,18 @@
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
         </arguments>
     </virtualType>
+    <virtualType name="SimplifyEmbeddedValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">SimplifyEmbeddedCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">SimplifyEmbeddedConfig</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="SimplifyValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -230,18 +256,44 @@
             <argument name="configInterface" xsi:type="object">SimplifyConfig</argument>
         </arguments>
     </virtualType>
+    <virtualType name="SimplifyEmbeddedValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">SimplifyEmbeddedDefaultValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedDefaultValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">SimplifyEmbeddedConfig</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="SimplifyConfig" type="Magento\Payment\Gateway\Config\Config">
         <arguments>
             <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::CODE</argument>
         </arguments>
     </virtualType>
+    <virtualType name="SimplifyEmbeddedConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::EMBEDDED_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyVaultTokenUiComponentProvider" type="MasterCard\SimplifyCommerce\Ui\TokenUiComponentProvider">
+        <arguments>
+            <argument name="vaultCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedVaultTokenUiComponentProvider" type="MasterCard\SimplifyCommerce\Ui\TokenUiComponentProvider">
+        <arguments>
+            <argument name="vaultCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_EMBEDDED_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
     <type name="MasterCard\SimplifyCommerce\Ui\ConfigProvider">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyConfig</argument>
+            <argument name="embeddedConfig" xsi:type="object">SimplifyEmbeddedConfig</argument>
         </arguments>
     </type>
-
-    <!-- Vault Payment -->
     <virtualType name="SimplifyVaultSaleCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">SimplifyVaultPaymentBuilder</argument>
@@ -275,12 +327,27 @@
     </type>
     <virtualType name="SimplifyVaultPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
         <arguments>
-            <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_CODE</argument>
+            <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyVaultEmbeddedPaymentConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_EMBEDDED_PAYMENT_CODE</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVaultPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
         <arguments>
             <argument name="configInterface" xsi:type="object">SimplifyVaultPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyVaultEmbeddedPaymentValueHandler" type="VaultPaymentDefaultValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">SimplifyVaultEmbeddedPaymentConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedPaymentValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">SimplifyEmbeddedConfig</argument>
         </arguments>
     </virtualType>
     <virtualType name="SimplifyVaultPaymentValueHandlerPool" type="VaultPaymentValueHandlerPool">
@@ -290,24 +357,154 @@
             </argument>
         </arguments>
     </virtualType>
+    <virtualType name="SimplifyVaultEmbeddedPaymentValueHandlerPool" type="VaultPaymentValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">SimplifyVaultEmbeddedPaymentValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
     <virtualType name="SimplifyVaultFacade" type="Magento\Vault\Model\Method\Vault">
         <arguments>
             <argument name="config" xsi:type="object">SimplifyVaultPaymentConfig</argument>
             <argument name="valueHandlerPool" xsi:type="object">SimplifyVaultPaymentValueHandlerPool</argument>
             <argument name="vaultProvider" xsi:type="object">SimplifyFacade</argument>
-            <argument name="code" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_CODE</argument>
+            <argument name="code" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_PAYMENT_CODE</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedVaultFacade" type="Magento\Vault\Model\Method\Vault">
+        <arguments>
+            <argument name="config" xsi:type="object">SimplifyVaultEmbeddedPaymentConfig</argument>
+            <argument name="valueHandlerPool" xsi:type="object">SimplifyVaultEmbeddedPaymentValueHandlerPool</argument>
+            <argument name="vaultProvider" xsi:type="object">SimplifyEmbeddedFacade</argument>
+            <argument name="code" xsi:type="const">MasterCard\SimplifyCommerce\Ui\ConfigProvider::VAULT_EMBEDDED_PAYMENT_CODE</argument>
         </arguments>
     </virtualType>
     <type name="Magento\Payment\Gateway\Command\CommandManagerPool">
         <arguments>
             <argument name="executors" xsi:type="array">
                 <item name="simplifycommerce" xsi:type="string">SimplifyCommandManager</item>
+                <item name="simplifycommerce_embedded" xsi:type="string">SimplifyEmbeddedCommandManager</item>
             </argument>
         </arguments>
     </type>
     <virtualType name="SimplifyCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
         <arguments>
             <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">SimplifyCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="capture" xsi:type="string">EmbeddedCaptureStrategyCommand</item>
+                <item name="token_sale" xsi:type="string">SimplifyEmbeddedTokenSaleCommand</item>
+                <item name="customer_sale" xsi:type="string">SimplifyEmbeddedCustomerSaleCommand</item>
+                <item name="settlement" xsi:type="string">SimplifyEmbeddedSettlementCommand</item>
+                <item name="authorize" xsi:type="string">EmbeddedAuthorizeStrategyCommand</item>
+                <item name="authorize_token" xsi:type="string">SimplifyEmbeddedAuthorizeTokenCommand</item>
+                <item name="create_customer" xsi:type="string">SimplifyEmbeddedCreateCustomerCommand</item>
+                <item name="authorize_customer" xsi:type="string">SimplifyEmbeddedAuthorizeCustomerCommand</item>
+                <item name="void" xsi:type="string">SimplifyEmbeddedVoidCommand</item>
+                <item name="refund" xsi:type="string">SimplifyEmbeddedRefundCommand</item>
+                <item name="vault_authorize" xsi:type="string">SimplifyEmbeddedVaultAuthorizeCommand</item>
+                <item name="vault_sale" xsi:type="string">SimplifyVaultSaleCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedAdapterFactory" type="MasterCard\SimplifyCommerce\lib\SimplifyAdapterFactory">
+        <arguments>
+            <argument name="config" xsi:type="object">SimplifyEmbeddedConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedCaptureStrategyCommand" type="MasterCard\SimplifyCommerce\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">SimplifyEmbeddedCommandPool</argument>
+            <argument name="simplifyAdapterFactory" xsi:type="object">SimplifyEmbeddedAdapterFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedTokenSaleCommand" type="SimplifyTokenSaleCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentCapture</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedClientPaymentCapture" type="MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentCapture">
+        <arguments>
+            <argument name="adapterFactory" xsi:type="object">SimplifyEmbeddedAdapterFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedClientPaymentAuthorize" type="MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentAuthorize">
+        <arguments>
+            <argument name="adapterFactory" xsi:type="object">SimplifyEmbeddedAdapterFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedClientCustomerCreate" type="MasterCard\SimplifyCommerce\Gateway\Http\Client\CustomerCreate">
+        <arguments>
+            <argument name="adapterFactory" xsi:type="object">SimplifyEmbeddedAdapterFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedClientPaymentVoid" type="MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentVoid">
+        <arguments>
+            <argument name="adapterFactory" xsi:type="object">SimplifyEmbeddedAdapterFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedClientPaymentRefund" type="MasterCard\SimplifyCommerce\Gateway\Http\Client\PaymentRefund">
+        <arguments>
+            <argument name="adapterFactory" xsi:type="object">SimplifyEmbeddedAdapterFactory</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedCustomerSaleCommand" type="SimplifyCustomerSaleCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentCapture</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedSettlementCommand" type="SimplifySettlementCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentCapture</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="EmbeddedAuthorizeStrategyCommand" type="MasterCard\SimplifyCommerce\Gateway\Command\AuthorizeStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">SimplifyEmbeddedCommandPool</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedAuthorizeTokenCommand" type="SimplifyAuthorizeTokenCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentAuthorize</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedCreateCustomerCommand" type="SimplifyCreateCustomerCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientCustomerCreate</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedAuthorizeCustomerCommand" type="SimplifyAuthorizeCustomerCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentAuthorize</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedVoidCommand" type="SimplifyVoidCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentVoid</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedRefundCommand" type="SimplifyRefundCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentRefund</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedVaultAuthorizeCommand" type="SimplifyVaultAuthorizeCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentAuthorize</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SimplifyEmbeddedVaultSaleCommand" type="SimplifyVaultSaleCommand">
+        <arguments>
+            <argument name="client" xsi:type="object">EmbeddedClientPaymentCapture</argument>
         </arguments>
     </virtualType>
 </config>

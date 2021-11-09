@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * Copyright (c) 2013-2020 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/** @var \Magento\Framework\View\Element\Template $block */
-?>
-<script>
-    require([
-        'jquery',
-        'underscore',
-        'Magento_Checkout/js/empty-cart'
-    ], function ($, _, emptyCart) {
-        if (!_.isEmpty(String($.cookieStorage.get('simplify_section_data_clean')))) {
-            emptyCart();
-            $.cookieStorage.set('simplify_section_data_clean', '');
-        }
-    });
-</script>
+define(
+    [
+        'uiComponent',
+        'Magento_Checkout/js/model/payment/renderer-list'
+    ],
+    function (
+        Component,
+        rendererList
+    ) {
+        'use strict';
+        rendererList.push(
+            {
+                type: 'simplifycommerce_embedded',
+                component: 'MasterCard_SimplifyCommerce/js/view/payment/method-renderer/simplifycommerce-embedded-method'
+            }
+        );
+        /** Add view logic here if needed */
+        return Component.extend({});
+    }
+);

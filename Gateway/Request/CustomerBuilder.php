@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 namespace MasterCard\SimplifyCommerce\Gateway\Request;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -29,20 +31,18 @@ class CustomerBuilder implements BuilderInterface
     private $customerRepository;
 
     /**
-     * CustomerBuilder constructor.
      * @param CustomerRepositoryInterface $customerRepository
      */
-    public function __construct(
-        CustomerRepositoryInterface $customerRepository
-    ) {
+    public function __construct(CustomerRepositoryInterface $customerRepository)
+    {
         $this->customerRepository = $customerRepository;
     }
 
     /**
      * @param array $buildSubject
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function build(array $buildSubject)
     {

@@ -29,7 +29,6 @@ Before you can use the module, you must have a Simplify Commerce account [https:
 
 We recommend that you configure the module using Simplify Commerce Sandbox configuration. This way you can make sure everything works well, before you start receiving live payments. For testing module configuration you can use test card numbers provided by Simplify Commerce at [https://simplify.com/commerce/docs/testing/test-card-numbers](https://simplify.com/commerce/docs/testing/test-card-numbers). You will find more details about the configuration in the following chapters.     
 
-
 ## Installation
 Before installing the module, make a full backup of your site.
 
@@ -87,23 +86,25 @@ Please follow these steps to configure the module:
 
 1. Login to Magento Admin dashboard 
 2. Go to *Stores* > *Configuration* > *Sales* > *Payment Methods*
-3. Expand *OTHER PAYMENT METHODS*, then *Simplify Commerce by MasterCard*
+3. Expand *OTHER PAYMENT METHODS*, then *Mastercard Payment Gateway Services - Simplify*
 4. Fill in configuration details as described below
 5. Click Save Config to store the configuration.
 6. Follow Magento instructions and clean application cache, to make sure that the new payment method is immediately available in your online store.  
 
 ### Configuration details
-The following settings are available in Simplify Commerce Payment Gateway configuration screen:
+A few Payment Options are available under the Simplify Commerce Payment Gateway options group: the Modal Payment Option and the Embedded Payment Option. Both options can be configured separately. Each of these Payment Options has the following settings:
 
-* *Enabled*: should be set to YES, to make Simplify Commerce available as payment method on checkout page
-* *Title*: name of the payment method displayed on checkout page
-* *Public API Key*: secret key from your Simplify Commerce Merchant Dashboard. For testing the module please use the Sandbox key. Once you see that payments from Magento 2 with test card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment you will be able to receive payments from real credit cards.
+* *Enabled*: should be set to YES to make Simplify Commerce available as a payment method on the checkout page
+* *Title*: Name of the payment method displayed on the checkout page
+* *Display Order*: position, at which this payment method should be listed on the checkout page
+* *Public API Key*: secret key from your Simplify Commerce Merchant Dashboard. For testing the module, please use the Sandbox key. Once you see that payments from Magento 2 with test card numbers are visible in your Simplify Commerce Merchant Dashboard, you should come back here and enter the Live key. From this moment, you will be able to receive payments from real credit cards.
 * *Private API Key*: the second secret key from Simplify Commerce Merchant Dashboard. The same rules as above apply.
-* *Display Order*: position, at which this payment method should be listed on checkout page
-* *New Order Status*: status assigned to a newly created order, before the payment has been received
-* *Payment Action*: determines when the buyer's card will be charged. If you select *Payment*, the card will be charged immediately. If you select *Authorization*, the payment will be verified and authorized, but no money will charged yet. Only when you issue an invoice for the received order, will the card be charged.
+* *Debug*: Set the option to YES if you want all communication between Magento and the Gateway to be logged into the var/log/mastercard.log file. It usually uses for the Test Mode to troubleshoot problems if the Payment Method doesn't work.
+* *Payment Action*: determines when the buyer's card will be charged. If you select *Payment*, the card will be charged immediately. If you select *Authorization*, the payment will be verified and authorized, but no money will be charged yet. Only when you issue an invoice for the received order will the card be charged.
+* *New Order Status*: status assigned to a newly created order before the payment has been received
 * *Payment from Applicable Countries*: countries from which customers are allowed in your online store
-* *Vault*: if enabled, provides store customers with ability to use the previously saved card information for checkout and Magento Instant Purchase feature
+* *Payment from Specific Countries*: This option is available if *Payment from Applicable Countries* option is set to the *Specific Countries* mode. It's possible to choose a few countries for whose the Payment Method will be available. The billing address is used to identify the country on the Checkout Page.
+* *Vault*: if enabled, provides store customers with the ability to use the previously saved card information for checkout and the Magento Instant Purchase feature
 
 ## License
 This software is Open Source, released under the Apache License 2.0. See [LICENSE.md](LICENSE.md) for more info.

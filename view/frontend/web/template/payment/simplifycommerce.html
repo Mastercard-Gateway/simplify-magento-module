@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013-2020 Mastercard
+  ~ Copyright (c) 2013-2021 Mastercard
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -58,7 +58,9 @@
             <!-- /ko -->
             <!-- ko ifnot: isModal() -->
             <div class="payment-method-simplifycommerce">
-                <iframe name="simplifycommerce-form" data-bind='attr: {"data-sc-key": getPublicKey()}'></iframe>
+                <iframe name="simplifycommerce-embedded-form"
+                        title="Simplify Commerce Payment Form"
+                        data-bind='attr: {"data-sc-key": getPublicKey(), "data-role": getCode() + "_pay", "title": $t("Simplify Commerce Payment Form")}, afterRender: initializeSimplify'></iframe>
             </div>
             <!--/ko-->
         </fieldset>
@@ -70,12 +72,13 @@
         <!-- ko if: isModal() -->
         <div class="actions-toolbar">
             <div class="primary">
-                <button type="button" data-bind='visible: false, attr: {"data-sc-key": getPublicKey(), "data-redirect-url": getRedirectUrl(), "data-role": getCode() + "_pay"}'>
+                <button type="button" data-bind='visible: false, attr: {"data-sc-key": getPublicKey(), "data-role": getCode() + "_pay"}'>
                     <span data-bind="i18n: 'Pay', afterRender: initializeSimplify"></span>
                 </button>
                 <button class="action primary checkout"
+                        title="Pay"
                         type="button"
-                        data-bind='click: savePayment, enable: (getCode() == isChecked()), css: {disabled: !isPlaceOrderActionAllowed()}'
+                        data-bind='attr: {"title": $t("Pay")}, click: savePayment, enable: (getCode() == isChecked()), css: {disabled: !isPlaceOrderActionAllowed()}'
                         disabled>
                     <span data-bind="i18n: 'Pay'"></span>
                 </button>

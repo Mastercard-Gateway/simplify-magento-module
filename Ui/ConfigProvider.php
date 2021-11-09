@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,16 @@ use MasterCard\SimplifyCommerce\Model\Config\Source\FormType;
 class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'simplifycommerce';
-    const VAULT_CODE = 'simplifycommerce_vault';
+    const EMBEDDED_CODE = 'simplifycommerce_embedded';
+    const VAULT_PAYMENT_CODE = 'simplifycommerce_vault';
+    const VAULT_EMBEDDED_PAYMENT_CODE = 'simplifycommerce_embedded_vault';
+    const PAYMENT_FORM_TYPE = 'payment_form_type';
 
-    const PAYMENT_CODE = 'simplifycommerce';
     const JS_COMPONENT = 'js_component_url';
     const PUBLIC_KEY = 'public_key';
     const IS_MODAL = 'is_modal';
-    const PAYMENT_FORM_TYPE = 'payment_form_type';
     const REDIRECT_URL = 'redirect_url';
+    const VAULT_CODE = 'vault_code';
 
     /**
      * @var ConfigInterface
@@ -45,16 +47,24 @@ class ConfigProvider implements ConfigProviderInterface
     protected $urlBuilder;
 
     /**
+     * @var ConfigInterface
+     */
+    private $embeddedConfig;
+
+    /**
      * ConfigProvider constructor.
      * @param ConfigInterface $config
      * @param UrlInterface $urlBuilder
+     * @param ConfigInterface $embeddedConfig
      */
     public function __construct(
         ConfigInterface $config,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        ConfigInterface $embeddedConfig
     ) {
         $this->config = $config;
         $this->urlBuilder = $urlBuilder;
+        $this->embeddedConfig = $embeddedConfig;
     }
 
     /**
@@ -76,12 +86,19 @@ class ConfigProvider implements ConfigProviderInterface
     {
         return [
             'payment' => [
-                self::PAYMENT_CODE => [
+                self::CODE => [
                     self::JS_COMPONENT => $this->config->getValue(self::JS_COMPONENT),
                     self::PUBLIC_KEY => $this->config->getValue(self::PUBLIC_KEY),
                     self::IS_MODAL => $this->config->getValue(self::PAYMENT_FORM_TYPE) == FormType::MODAL,
                     self::REDIRECT_URL => $this->getPlaceOrderUrl(),
-                    'vault_code' => self::VAULT_CODE,
+                    self::VAULT_CODE => self::VAULT_PAYMENT_CODE,
+                ],
+                self::EMBEDDED_CODE => [
+                    self::JS_COMPONENT => $this->embeddedConfig->getValue(self::JS_COMPONENT),
+                    self::PUBLIC_KEY => $this->embeddedConfig->getValue(self::PUBLIC_KEY),
+                    self::IS_MODAL => $this->embeddedConfig->getValue(self::PAYMENT_FORM_TYPE) == FormType::MODAL,
+                    self::REDIRECT_URL => $this->getPlaceOrderUrl(),
+                    self::VAULT_CODE => self::VAULT_EMBEDDED_PAYMENT_CODE,
                 ]
             ]
         ];

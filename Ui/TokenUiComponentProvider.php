@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2013-2020 Mastercard
+ * Copyright (c) 2013-2021 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,15 +35,23 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
     protected $urlBuilder;
 
     /**
+     * @var string|null
+     */
+    protected $vaultCode;
+
+    /**
      * @param TokenUiComponentInterfaceFactory $componentFactory
      * @param UrlInterface $urlBuilder
+     * @param string|null $vaultCode
      */
     public function __construct(
         TokenUiComponentInterfaceFactory $componentFactory,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        $vaultCode = null
     ) {
         $this->componentFactory = $componentFactory;
         $this->urlBuilder = $urlBuilder;
+        $this->vaultCode = $vaultCode;
     }
 
     /**
@@ -55,7 +63,7 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
         $component = $this->componentFactory->create(
             [
                 'config' => [
-                    'code' => ConfigProvider::VAULT_CODE,
+                    'code' => $this->vaultCode,
                     TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
                     TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
                 ],

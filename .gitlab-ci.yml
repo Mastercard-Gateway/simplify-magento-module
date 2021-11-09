@@ -1,0 +1,114 @@
+stages:
+  - test
+  - deploy
+
+variables:
+  COMPOSER_MIRROR_PATH_REPOS: 1
+  COMPOSER_ALLOW_SUPERUSER: 1
+  COMPOSER_MEMORY_LIMIT: -1
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+
+deploy-to-uat:
+  image: gitlab.extensions.ontap.cloud:5050/mpgs/docker-ontap-php:7.4-2
+  stage: deploy
+  script:
+    - curl -v -X POST -F "token=$PIPELINE_TOKEN" -F ref=master -F "variables[EXTENSION]=$PLAYBOOK" "$TRIGGER_URL"
+  only:
+    refs:
+      - master
+
+sonarqube-check:
+  stage: test
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner
+  allow_failure: true
+  only:
+    - merge_requests
+
+.magento:build: &magento-build
+  before_script:
+    - mkdir -p _build
+    - ln -s /magento _build/magento
+    - git clone . _build/module
+    - (cd _build/module && git checkout -b build && sed -i '/"version"/d' composer.json && cat composer.json)
+    - cd _build/magento
+    - composer.phar config repositories.ontap composer https://packages.ontapgroup.com/
+    - composer.phar config repositories.modules path $CI_PROJECT_DIR/_build/module
+    - composer.phar config --unset repositories.0
+    - composer.phar config repo.packagist false
+    - composer.phar config minimum-stability dev
+    - composer.phar config prefer-stable true
+    - composer.phar require --no-suggest --dev --no-update ontap/ambassador:^1.2
+    - composer.phar require --no-suggest $MODULE_NAME:dev-build
+    - |
+      cat > $MODULE_DIR/Makefile <<- "EOF"
+      MOD_PATH = $(abspath ./../../ontap/ambassador)
+      BIN_PATH = $(abspath ./../../bin)
+      include $(MOD_PATH)/Makefile
+      EOF
+
+magento-2.3.6:phpcs:
+  image: ontap/magento:2.3.6
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - (cd $MODULE_DIR && make phpcs)
+  <<: *magento-build
+
+magento-2.3.6:phpstan:
+  image: ontap/magento:2.3.6
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - (cd $MODULE_DIR && make phpstan)
+  <<: *magento-build
+
+magento-2.3.6:compile:
+  image: ontap/magento:2.3.6
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - php bin/magento module:enable --all
+    - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
+  <<: *magento-build
+
+magento-2.4.1:phpcs:
+  image: ontap/magento:2.4.1
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - (cd $MODULE_DIR && make phpcs)
+  <<: *magento-build
+
+magento-2.4.1:phpstan:
+  image: ontap/magento:2.4.1
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - (cd $MODULE_DIR && make phpstan)
+  <<: *magento-build
+
+magento-2.4.1:compile:
+  image: ontap/magento:2.4.1
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - php bin/magento module:enable --all
+    - php -d memory_limit=1G bin/magento setup:di:compile --ansi --no-interaction
+  <<: *magento-build
