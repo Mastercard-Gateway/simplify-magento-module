@@ -46,38 +46,38 @@ Log on to your Magento 2 server and navigate to Magento installation folder. The
 Run the following commands to download and install the module:
 
     composer config repositories.mastercard-module-simplifycommerce git https://github.com/simplifycom/simplify-magento-module.git
-    composer require mastercard/module-simplifycommerce:~3.0.0 --prefer-dist
+    composer require mastercard/module-simplifycommerce
+    ./bin/magento module:enable MasterCard_SimplifyCommerce
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 
 When asked by Composer for user name and password for Magento repository at [https://repo.magento.com](https://repo.magento.com), enter the Magento Marketplace public key as user name, and private key as password.
 
-Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
+Verify whether the module has been successfully installed. Log in to Magento Admin dashboard and go to *Stores* > *Configuration* > *Sales* > *Payment Methods*. Settings of the Simplify Commerce module should be there under the name "Mastercard Payment Gateway Services - Simplify".
 
-### Manual installation 
-If you prefer to deploy and install the module without Composer, proceed with the following steps:
-
-Download module from [https://github.com/simplifycom/simplify-magento-module/releases](https://github.com/simplifycom/simplify-magento-module/releases)
-
-Create folder structure inside the the Magento main folder:
-
-    ./vendor/mastercard/module-simplifycommerce 
-
-Extract module files into that folder and execute the following commands:
-
-    ./bin/magento setup:upgrade
-    ./bin/magento cache:clean
-    
-Verify whether the module has been succesfully installed. Log in to Magento Admin dashboard and go to *System* > *Web Setup Wizard* > *Component Manager*. Simplify Commerce module should be there at the end of the list. Please make sure that it's enabled. The status icon should be green. If it's red, you need to enable the module, by selecting *Enable* action in the actions drop-down at the right, then following the provided instructions. 
-
-
-### Deinstallation
+#### Deinstallation
 If you want to uninstall the previously installed Simplify Commerce Payment Gateway module, please run the following commands:
 
     ./bin/magento module:uninstall MasterCard_SimplifyCommerce
     ./bin/magento setup:upgrade
     ./bin/magento cache:clean
 
+### Manual installation 
+If you prefer to deploy and install the module without Composer, proceed with the following steps:
+
+Download module from [https://github.com/simplifycom/simplify-magento-module/releases](https://github.com/simplifycom/simplify-magento-module/releases).
+
+Create folder structure inside the Magento main folder:
+
+    ./app/code/MasterCard/SimplifyCommerce
+
+Extract module files into that folder and execute the following commands:
+
+    ./bin/magento module:enable MasterCard_SimplifyCommerce
+    ./bin/magento setup:upgrade
+    ./bin/magento cache:clean
+
+Verify whether the module has been successfully installed. Log in to Magento Admin dashboard and go to *Stores* > *Configuration* > *Sales* > *Payment Methods*. Settings of the Simplify Commerce module should be there under the name "Mastercard Payment Gateway Services - Simplify".
 
 ## Configuration
 
