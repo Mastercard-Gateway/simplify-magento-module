@@ -146,6 +146,11 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/simplifycommerce_embedded_vault/active</config_path>
                     </field>
+                    <field id="button_color" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Hosted Payments Button Color</label>
+                        <config_path>payment/simplifycommerce_embedded/button_color</config_path>
+                        <frontend_model>MasterCard\SimplifyCommerce\Block\Adminhtml\ColorPicker</frontend_model>
+                    </field>
                 </group>
             </group>
         </section>

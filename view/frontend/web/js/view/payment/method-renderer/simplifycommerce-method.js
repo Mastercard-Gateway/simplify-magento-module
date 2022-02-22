@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2021 Mastercard
+ * Copyright (c) 2013-2022 Mastercard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,5 +194,17 @@ define([
         isVaultEnabled: function () {
             return this.vaultEnabler.isVaultEnabled();
         },
+
+        /**
+         * @returns {String}
+         */
+        getButtonColor: function () {
+            var config, buttonColor;
+
+            config = window.checkoutConfig["payment"][this.getCode()] || {};
+            buttonColor = config["button_color"] || null;
+
+            return buttonColor;
+        }
     });
 });
