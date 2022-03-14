@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] - 2022-03-11
+### Changed
+- Installation instructions in the README.md file were updated
+- Color selector for Pay Button on the module Configuration page
+
+
 ## [3.1.1] - 2022-01-04
 ### Fixed
 - Installation instructions in the README.md file were updated
