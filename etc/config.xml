@@ -73,6 +73,7 @@
                 <can_use_internal>0</can_use_internal>
                 <privateInfoKeys />
                 <paymentInfoKeys>last4,type,expMonth,expYear,source,paymentStatus</paymentInfoKeys>
+                <button_color>#1979c3</button_color>
             </simplifycommerce_embedded>
             <simplifycommerce_vault>
                 <model>SimplifyVaultFacade</model>
