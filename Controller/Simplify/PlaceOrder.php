@@ -195,6 +195,9 @@ class PlaceOrder extends Action
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         $quote = $this->checkoutSession->getQuote();
 
+        //Initiate the cart redirect on top to avoid context scope change due to placeOrder
+        $resultCartRedirect = $resultRedirect->setPath('checkout/cart', ['_secure' => true]);
+        
         try {
             $checkoutMethod = Onepage::METHOD_GUEST;
             if ($this->customerSession->isLoggedIn()) {
@@ -222,6 +225,6 @@ class PlaceOrder extends Action
             );
         }
 
-        return $resultRedirect->setPath('checkout/cart', ['_secure' => true]);
+        return $resultCartRedirect;
     }
 }
