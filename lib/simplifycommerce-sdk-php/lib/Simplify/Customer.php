@@ -1,31 +1,31 @@
 <?php
 /*
- * Copyright (c) 2013 - 2019 MasterCard International Incorporated
+ * Copyright (c) 2013 - 2022 MasterCard International Incorporated
  * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, are 
  * permitted provided that the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list of
+ * 
+ * Redistributions of source code must retain the above copyright notice, this list of 
  * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other materials
+ * Redistributions in binary form must reproduce the above copyright notice, this list of 
+ * conditions and the following disclaimer in the documentation and/or other materials 
  * provided with the distribution.
- * Neither the name of the MasterCard International Incorporated nor the names of its
- * contributors may be used to endorse or promote products derived from this software
+ * Neither the name of the MasterCard International Incorporated nor the names of its 
+ * contributors may be used to endorse or promote products derived from this software 
  * without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
- * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; 
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
+ * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
  * SUCH DAMAGE.
  */
-// phpcs:ignoreFile
+
 
 class Simplify_Customer extends Simplify_Object {
     /**
@@ -51,13 +51,16 @@ class Simplify_Customer extends Simplify_Object {
      *     <dt><tt>subscriptions.billingCycleLimit</tt></dt>    <dd>The number of fixed billing cycles for a plan. Only used if the billingCycle parameter is set to FIXED. Example: 4 </dd>
      *     <dt><tt>subscriptions.coupon</tt></dt>    <dd>Coupon associated with the subscription for the customer. </dd>
      *     <dt><tt>subscriptions.currency</tt></dt>    <dd>Currency code (ISO-4217). Must match the currency associated with your account. </dd>
+     *     <dt><tt>subscriptions.currentPeriodEnd</tt></dt>    <dd>End date of subscription's current period </dd>
+     *     <dt><tt>subscriptions.currentPeriodStart</tt></dt>    <dd>Start date of subscription's current period </dd>
      *     <dt><tt>subscriptions.customer</tt></dt>    <dd>The customer ID to create the subscription for. Do not supply this when creating a customer. </dd>
      *     <dt><tt>subscriptions.frequency</tt></dt>    <dd>Frequency of payment for the plan. Used in conjunction with frequencyPeriod. Valid values are "DAILY", "WEEKLY", "MONTHLY" and "YEARLY". </dd>
      *     <dt><tt>subscriptions.frequencyPeriod</tt></dt>    <dd>Period of frequency of payment for the plan. Example: if the frequency is weekly, and periodFrequency is 2, then the subscription is billed bi-weekly. </dd>
-     *     <dt><tt>subscriptions.name</tt></dt>    <dd>Name describing subscription </dd>
+     *     <dt><tt>subscriptions.name</tt></dt>    <dd>Name describing subscription [max length: 50] </dd>
      *     <dt><tt>subscriptions.plan</tt></dt>    <dd>The plan ID that the subscription should be created from. </dd>
      *     <dt><tt>subscriptions.quantity</tt></dt>    <dd>Quantity of the plan for the subscription. [min value: 1] </dd>
      *     <dt><tt>subscriptions.renewalReminderLeadDays</tt></dt>    <dd>If set, how many days before the next billing cycle that a renewal reminder is sent to the customer. If null, then no emails are sent. Minimum value is 7 if set. </dd>
+     *     <dt><tt>subscriptions.source</tt></dt>    <dd>Source of where subscription was created </dd>
      *     <dt><tt>token</tt></dt>    <dd>If specified, card associated with card token will be used </dd></dl>
      * @param     $authentication -  information used for the API call.  If no value is passed the global keys Simplify::public_key and Simplify::private_key are used.  <i>For backwards compatibility the public and private keys may be passed instead of the authentication object.<i/>
      * @return    Customer a Customer object.
