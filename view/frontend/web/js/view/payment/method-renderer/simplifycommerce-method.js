@@ -133,8 +133,7 @@ define([
                             amount: this.totals().base_grand_total * 100,
                             currency: this.totals().quote_currency_code,
                             reference: quote.getQuoteId(),
-                            operation: 'create.token',
-                            selector: '[data-role=' + this.getCode() + '_pay]',
+                            operation: 'create.token'
                         }
                     ).closeOnCompletion();
                 }.bind(this)
