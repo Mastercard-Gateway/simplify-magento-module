@@ -265,7 +265,7 @@ class Simplify_PaymentsApi
      * @param $expectedArgCount
      * @return Simplify_Authentication
      */
-    static function buildAuthenticationObject($authentication = null, $args, $expectedArgCount){
+    static function buildAuthenticationObject($authentication = null, $args = null, $expectedArgCount = null){
 
         if(sizeof($args) > $expectedArgCount) {
             $authentication = new Simplify_Authentication($args[$expectedArgCount-1], $args[$expectedArgCount]);
