@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2013 - 2019 MasterCard International Incorporated
+ * Copyright (c) 2013 - 2022 MasterCard International Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
@@ -25,7 +25,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-// phpcs:ignoreFile
+
 
 class Simplify_PaymentsApi
 {
@@ -265,7 +265,7 @@ class Simplify_PaymentsApi
      * @param $expectedArgCount
      * @return Simplify_Authentication
      */
-    static function buildAuthenticationObject($authentication = null, $args, $expectedArgCount){
+    static function buildAuthenticationObject($authentication, $args, $expectedArgCount){
 
         if(sizeof($args) > $expectedArgCount) {
             $authentication = new Simplify_Authentication($args[$expectedArgCount-1], $args[$expectedArgCount]);
