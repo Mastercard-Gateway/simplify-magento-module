@@ -41,7 +41,7 @@ class SimplifyAdapter
 
         Simplify::$publicKey = $publicKey;
         Simplify::$privateKey = $privateKey;
-        Simplify::$userAgent = 'Magento-3.2.0';
+        Simplify::$userAgent = 'Magento-3.3.0';
     }
 
     /**

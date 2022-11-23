@@ -1,6 +1,6 @@
 {
     "name": "mastercard/module-simplifycommerce",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "description": "Mastercard Payment Gateway Services - Simplify",
     "license": "Apache-2.0",
     "authors": [
