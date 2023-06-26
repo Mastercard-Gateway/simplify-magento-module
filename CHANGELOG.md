@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.0] - 2023-06-26
+### Changed
+- Add compatibility with Magento 2.4.4 and higher versions
+
 ## [3.2.0] - 2022-03-11
 ### Changed
 - Installation instructions in the README.md file were updated
