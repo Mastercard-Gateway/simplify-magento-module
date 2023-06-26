@@ -265,15 +265,10 @@ class Simplify_PaymentsApi
      * @param $expectedArgCount
      * @return Simplify_Authentication
      */
-    static function buildAuthenticationObject($authentication = null, $args, $expectedArgCount){
+    static function buildAuthenticationObject($args, $expectedArgCount, $authentication = null){
 
-        if(sizeof($args) > $expectedArgCount) {
-            $authentication = new Simplify_Authentication($args[$expectedArgCount-1], $args[$expectedArgCount]);
-        }
+        $authentication = new Simplify_Authentication();
 
-        if ($authentication == null){
-            $authentication = new Simplify_Authentication();
-        }
 
         // check that the keys have been set, if not use the global keys
         if ( empty($authentication->publicKey)){

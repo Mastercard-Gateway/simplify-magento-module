@@ -24,7 +24,7 @@ use Magento\Framework\Component\ComponentRegistrar;
 use Magento\Framework\Component\ComponentRegistrarInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Filesystem\Directory\ReadFactory;
-use Zend_Json;
+use \Laminas\Json\Json;
 
 class ModuleVersion extends Heading
 {
@@ -82,7 +82,7 @@ class ModuleVersion extends Heading
 
             try {
                 $jsonData = $dir->readFile('composer.json');
-                $data = Zend_Json::decode($jsonData);
+                $data = \Laminas\Json\Json::decode($jsonData, true);
             } catch (Exception $e) {
                 $this->_logger->error('Module read error', [
                     'exception' => $e
